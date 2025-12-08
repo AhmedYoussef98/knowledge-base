@@ -1,12 +1,23 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { useTenant } from '../contexts/TenantContext';
-import { getMyTenant, updateTenantSettings, generateSlug, isSlugAvailable } from '../services/tenantApi';
+import {
+    getMyTenant,
+    updateTenantSettings,
+    generateSlug,
+    isSlugAvailable,
+    getTenantMembers,
+    addTenantMemberById,
+    updateMemberRole,
+    removeTenantMember,
+    TenantMember
+} from '../services/tenantApi';
+import { supabase } from '../services/supabase';
 import { Tenant } from '../contexts/TenantContext';
 import {
     Settings as SettingsIcon, Key, Palette, Globe, Save,
-    Loader2, AlertCircle, CheckCircle2, LogOut, ExternalLink
+    Loader2, AlertCircle, CheckCircle2, LogOut, ExternalLink,
+    Users, UserPlus, Trash2, Shield, Eye, Crown
 } from 'lucide-react';
 
 export default function Settings() {
@@ -26,6 +37,15 @@ export default function Settings() {
     const [primaryColor, setPrimaryColor] = useState('#F97316');
     const [originalSlug, setOriginalSlug] = useState('');
 
+    // Team management
+    const [members, setMembers] = useState<TenantMember[]>([]);
+    const [loadingMembers, setLoadingMembers] = useState(false);
+    const [newMemberEmail, setNewMemberEmail] = useState('');
+    const [newMemberRole, setNewMemberRole] = useState<'admin' | 'viewer'>('viewer');
+    const [addingMember, setAddingMember] = useState(false);
+    const [memberError, setMemberError] = useState('');
+    const [memberSuccess, setMemberSuccess] = useState('');
+
     useEffect(() => {
         if (!authLoading && !user) {
             navigate('/login');
@@ -43,6 +63,9 @@ export default function Settings() {
                     setOriginalSlug(myTenant.slug);
                     setApiKey(myTenant.gemini_api_key || '');
                     setPrimaryColor(myTenant.primary_color || '#F97316');
+
+                    // Fetch team members
+                    fetchMembers(myTenant.id);
                 } else {
                     navigate('/onboarding');
                 }
@@ -51,6 +74,73 @@ export default function Settings() {
         };
         fetchTenant();
     }, [user, navigate]);
+
+    const fetchMembers = async (tenantId: string) => {
+        setLoadingMembers(true);
+        const memberList = await getTenantMembers(tenantId);
+        setMembers(memberList);
+        setLoadingMembers(false);
+    };
+
+    const handleAddMember = async () => {
+        if (!tenant || !newMemberEmail.trim()) return;
+
+        setMemberError('');
+        setMemberSuccess('');
+        setAddingMember(true);
+
+        try {
+            // Look up user by email
+            const { data, error: lookupError } = await supabase
+                .from('auth.users')
+                .select('id')
+                .eq('email', newMemberEmail.trim())
+                .single();
+
+            if (lookupError || !data) {
+                // Try using the auth API to find the user
+                // For now, show an error that the user must sign up first
+                setMemberError('User not found. They must sign up first, then you can add them by their email.');
+                setAddingMember(false);
+                return;
+            }
+
+            const { error: addError } = await addTenantMemberById(tenant.id, data.id, newMemberRole);
+
+            if (addError) {
+                if (addError.message.includes('duplicate')) {
+                    setMemberError('This user is already a team member.');
+                } else {
+                    setMemberError(addError.message);
+                }
+            } else {
+                setMemberSuccess('Team member added successfully!');
+                setNewMemberEmail('');
+                fetchMembers(tenant.id);
+                setTimeout(() => setMemberSuccess(''), 3000);
+            }
+        } catch (err: any) {
+            setMemberError('Failed to add member. The user may not exist yet.');
+        }
+
+        setAddingMember(false);
+    };
+
+    const handleUpdateRole = async (memberId: string, role: 'admin' | 'viewer') => {
+        const { error } = await updateMemberRole(memberId, role);
+        if (!error && tenant) {
+            fetchMembers(tenant.id);
+        }
+    };
+
+    const handleRemoveMember = async (memberId: string) => {
+        if (!confirm('Are you sure you want to remove this team member?')) return;
+
+        const { error } = await removeTenantMember(memberId);
+        if (!error && tenant) {
+            fetchMembers(tenant.id);
+        }
+    };
 
     const handleSave = async () => {
         if (!tenant) return;
@@ -181,6 +271,133 @@ export default function Settings() {
                     </div>
                 </div>
 
+                {/* Team Management */}
+                <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+                    <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-6">
+                        <Users className="w-5 h-5 text-gray-400" />
+                        Team Members
+                    </h2>
+
+                    {/* Owner info */}
+                    <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl mb-4">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                                <Crown className="w-5 h-5 text-green-600" />
+                            </div>
+                            <div>
+                                <p className="font-medium text-gray-900">{user?.email}</p>
+                                <p className="text-sm text-gray-500">You (Owner)</p>
+                            </div>
+                        </div>
+                        <span className="px-3 py-1 bg-green-100 text-green-700 text-sm font-medium rounded-full">
+                            Owner
+                        </span>
+                    </div>
+
+                    {/* Members list */}
+                    {loadingMembers ? (
+                        <div className="flex justify-center py-4">
+                            <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                        </div>
+                    ) : members.length > 0 ? (
+                        <div className="space-y-3 mb-6">
+                            {members.map(member => (
+                                <div key={member.id} className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                    <div className="flex items-center gap-3">
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center ${member.role === 'admin' ? 'bg-blue-100' : 'bg-gray-100'
+                                            }`}>
+                                            {member.role === 'admin'
+                                                ? <Shield className="w-5 h-5 text-blue-600" />
+                                                : <Eye className="w-5 h-5 text-gray-500" />
+                                            }
+                                        </div>
+                                        <div>
+                                            <p className="font-medium text-gray-900">{member.user_id.slice(0, 8)}...</p>
+                                            <p className="text-sm text-gray-500 capitalize">{member.role}</p>
+                                        </div>
+                                    </div>
+                                    <div className="flex items-center gap-2">
+                                        <select
+                                            value={member.role}
+                                            onChange={(e) => handleUpdateRole(member.id, e.target.value as 'admin' | 'viewer')}
+                                            className="px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:ring-2 focus:ring-blue-500"
+                                        >
+                                            <option value="admin">Admin</option>
+                                            <option value="viewer">Viewer</option>
+                                        </select>
+                                        <button
+                                            onClick={() => handleRemoveMember(member.id)}
+                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Remove member"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </button>
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-gray-500 text-sm mb-6">No team members yet. Add members below.</p>
+                    )}
+
+                    {/* Add member form */}
+                    <div className="border-t border-gray-100 pt-6">
+                        <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                            <UserPlus className="w-4 h-4" />
+                            Add Team Member
+                        </h3>
+
+                        {memberError && (
+                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-4">
+                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                <span>{memberError}</span>
+                            </div>
+                        )}
+
+                        {memberSuccess && (
+                            <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm mb-4">
+                                <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
+                                <span>{memberSuccess}</span>
+                            </div>
+                        )}
+
+                        <div className="flex gap-3">
+                            <input
+                                type="email"
+                                placeholder="team@example.com"
+                                value={newMemberEmail}
+                                onChange={(e) => setNewMemberEmail(e.target.value)}
+                                className="flex-1 px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                            />
+                            <select
+                                value={newMemberRole}
+                                onChange={(e) => setNewMemberRole(e.target.value as 'admin' | 'viewer')}
+                                className="px-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500"
+                            >
+                                <option value="viewer">Viewer</option>
+                                <option value="admin">Admin</option>
+                            </select>
+                            <button
+                                onClick={handleAddMember}
+                                disabled={addingMember || !newMemberEmail.trim()}
+                                className="px-4 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                {addingMember ? (
+                                    <Loader2 className="w-4 h-4 animate-spin" />
+                                ) : (
+                                    <>
+                                        <UserPlus className="w-4 h-4" />
+                                        Add
+                                    </>
+                                )}
+                            </button>
+                        </div>
+                        <p className="text-xs text-gray-500 mt-2">
+                            The user must have signed up first. Enter their email to add them to your team.
+                        </p>
+                    </div>
+                </div>
+
                 {/* AI Settings */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
                     <h2 className="text-lg font-semibold text-gray-900 flex items-center gap-2 mb-6">
@@ -230,8 +447,8 @@ export default function Settings() {
                                     key={color}
                                     onClick={() => setPrimaryColor(color)}
                                     className={`w-10 h-10 rounded-full transition-all ${primaryColor === color
-                                            ? 'ring-4 ring-offset-2 ring-blue-400 scale-110'
-                                            : 'hover:scale-105'
+                                        ? 'ring-4 ring-offset-2 ring-blue-400 scale-110'
+                                        : 'hover:scale-105'
                                         }`}
                                     style={{ backgroundColor: color }}
                                 />
