@@ -4,7 +4,7 @@ import { Navbar } from '../components/Navbar';
 import { QuestionTable } from '../components/Admin/QuestionTable';
 import { QuestionModal } from '../components/Admin/QuestionModal';
 import { getAllContent, getCategories } from '../services/api';
-import { getTenantBySlug, getMyTenant } from '../services/tenantApi';
+import { getTenantBySlug, getUserTenantRole, UserRole } from '../services/tenantApi';
 import { useAuth } from '../contexts/AuthContext';
 import { Tenant } from '../contexts/TenantContext';
 import { KnowledgeItem, CategoryData } from '../types';
@@ -33,7 +33,7 @@ export default function Admin() {
 
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [tenantLoading, setTenantLoading] = useState(true);
-    const [isOwner, setIsOwner] = useState(false);
+    const [userRole, setUserRole] = useState<UserRole>(null);
     const [unauthorized, setUnauthorized] = useState(false);
 
     const [data, setData] = useState<KnowledgeItem[]>([]);
@@ -42,7 +42,10 @@ export default function Admin() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<KnowledgeItem | undefined>(undefined);
 
-    // Fetch tenant and verify ownership
+    // Check if user can edit (owner or admin)
+    const canEdit = userRole === 'owner' || userRole === 'admin';
+
+    // Fetch tenant and verify access
     useEffect(() => {
         const fetchTenant = async () => {
             if (!slug) {
@@ -60,16 +63,19 @@ export default function Admin() {
 
             setTenant(tenantData);
 
-            // Check if current user owns this tenant
-            if (user && tenantData.owner_id === user.id) {
-                setIsOwner(true);
-            } else if (!authLoading && !user) {
+            // Check user's role for this tenant
+            if (user) {
+                const role = await getUserTenantRole(tenantData.id);
+                setUserRole(role);
+
+                // If not admin or owner, deny access
+                if (role !== 'owner' && role !== 'admin') {
+                    setUnauthorized(true);
+                }
+            } else if (!authLoading) {
                 // Not logged in, redirect to login
                 navigate('/login');
                 return;
-            } else if (user && tenantData.owner_id !== user.id) {
-                // Logged in but not owner
-                setUnauthorized(true);
             }
 
             setTenantLoading(false);
@@ -99,10 +105,10 @@ export default function Admin() {
     };
 
     useEffect(() => {
-        if (tenant?.id && isOwner) {
+        if (tenant?.id && canEdit) {
             fetchData();
         }
-    }, [tenant?.id, isOwner]);
+    }, [tenant?.id, canEdit]);
 
     const handleEdit = (item: KnowledgeItem) => {
         setEditingItem(item);
@@ -136,7 +142,7 @@ export default function Admin() {
                         <AlertCircle className="w-8 h-8 text-red-500" />
                     </div>
                     <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-                    <p className="text-gray-600 mb-6">You don't have permission to access this admin panel.</p>
+                    <p className="text-gray-600 mb-6">You don't have permission to access this admin panel. Only owners and admins can manage content.</p>
                     <div className="flex gap-4 justify-center">
                         <Link
                             to="/login"
@@ -145,10 +151,10 @@ export default function Admin() {
                             Sign In
                         </Link>
                         <Link
-                            to="/"
+                            to={slug ? `/kb/${slug}` : '/'}
                             className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
                         >
-                            Go Home
+                            View Knowledge Base
                         </Link>
                     </div>
                 </div>
@@ -164,6 +170,8 @@ export default function Admin() {
                 t={t}
                 tenantName={tenant?.name}
                 primaryColor={primaryColor}
+                tenantSlug={slug}
+                isAdmin={canEdit}
             />
 
             <div className="container mx-auto px-4 py-8 max-w-6xl">
@@ -175,16 +183,22 @@ export default function Admin() {
                             <LayoutDashboard className="w-8 h-8" style={{ color: primaryColor }} />
                             Admin Dashboard
                         </h1>
-                        <p className="text-gray-500 mt-2">Manage questions, answers, and categories.</p>
+                        <p className="text-gray-500 mt-2">
+                            Manage questions, answers, and categories.
+                            {userRole === 'admin' && <span className="text-blue-600 ml-2">(Admin)</span>}
+                            {userRole === 'owner' && <span className="text-green-600 ml-2">(Owner)</span>}
+                        </p>
                     </div>
                     <div className="flex gap-3">
-                        <Link
-                            to="/settings"
-                            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
-                        >
-                            <Settings className="w-4 h-4" />
-                            Settings
-                        </Link>
+                        {userRole === 'owner' && (
+                            <Link
+                                to="/settings"
+                                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
+                            >
+                                <Settings className="w-4 h-4" />
+                                Settings
+                            </Link>
+                        )}
                         <Link
                             to={`/kb/${slug}`}
                             className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"

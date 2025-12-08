@@ -5,7 +5,7 @@ import { KnowledgeCard } from '../components/KnowledgeCard';
 import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
 import { AIAssistant } from '../components/AIAssistant';
 import { getAllContent, getCategories, getAnalytics, getRecentSearches, logSearchEvent, logQuestionClickEvent } from '../services/api';
-import { getTenantBySlug } from '../services/tenantApi';
+import { getTenantBySlug, getUserTenantRole, UserRole } from '../services/tenantApi';
 import { Tenant } from '../contexts/TenantContext';
 import { useAuth } from '../contexts/AuthContext';
 import { KnowledgeItem, CategoryData, AnalyticsData, SearchLog, SortOption } from '../types';
@@ -81,8 +81,11 @@ export default function Home() {
     const [tenantLoading, setTenantLoading] = useState(true);
     const [tenantNotFound, setTenantNotFound] = useState(false);
 
-    // Check if current user is the owner
-    const isOwner = user?.id === tenant?.owner_id;
+    // User role state
+    const [userRole, setUserRole] = useState<UserRole>(null);
+
+    // Check if current user can edit (owner or admin)
+    const canEdit = userRole === 'owner' || userRole === 'admin';
 
     // Language State
     const [lang, setLang] = useState<'ar' | 'en'>('en');
@@ -125,13 +128,19 @@ export default function Home() {
             const tenantData = await getTenantBySlug(slug);
             if (tenantData) {
                 setTenant(tenantData);
+
+                // Fetch user's role for this tenant
+                if (user) {
+                    const role = await getUserTenantRole(tenantData.id);
+                    setUserRole(role);
+                }
             } else {
                 setTenantNotFound(true);
             }
             setTenantLoading(false);
         };
         fetchTenant();
-    }, [slug]);
+    }, [slug, user]);
 
     // Fetch data once tenant is loaded
     const fetchData = async () => {
@@ -250,7 +259,7 @@ export default function Home() {
                 tenantName={tenant?.name}
                 primaryColor={primaryColor}
                 tenantSlug={slug}
-                isOwner={isOwner}
+                isAdmin={canEdit}
             />
 
             <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">

@@ -10,7 +10,7 @@ interface Props {
   tenantName?: string;
   primaryColor?: string;
   tenantSlug?: string;
-  isOwner?: boolean;
+  isAdmin?: boolean;
 }
 
 export const Navbar: React.FC<Props> = ({
@@ -20,7 +20,7 @@ export const Navbar: React.FC<Props> = ({
   tenantName,
   primaryColor = '#1E293B',
   tenantSlug,
-  isOwner = false
+  isAdmin = false
 }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
@@ -66,8 +66,8 @@ export const Navbar: React.FC<Props> = ({
               <span className="hidden md:inline font-medium">Home</span>
             </Link>
 
-            {/* Admin Link - only show if user is owner */}
-            {isOwner && tenantSlug && (
+            {/* Admin Link - only show if user is admin */}
+            {isAdmin && tenantSlug && (
               <Link
                 to={`/kb/${tenantSlug}/admin`}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm border border-white/20"
