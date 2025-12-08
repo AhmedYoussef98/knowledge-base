@@ -7,6 +7,7 @@ import { AIAssistant } from '../components/AIAssistant';
 import { getAllContent, getCategories, getAnalytics, getRecentSearches, logSearchEvent, logQuestionClickEvent } from '../services/api';
 import { getTenantBySlug } from '../services/tenantApi';
 import { Tenant } from '../contexts/TenantContext';
+import { useAuth } from '../contexts/AuthContext';
 import { KnowledgeItem, CategoryData, AnalyticsData, SearchLog, SortOption } from '../types';
 import { Search, Filter, SortAsc, History, BarChart2, Loader2, Sparkles, AlertCircle } from 'lucide-react';
 
@@ -72,10 +73,16 @@ export default function Home() {
     // Get tenant slug from URL
     const { slug } = useParams<{ slug: string }>();
 
+    // Auth context
+    const { user } = useAuth();
+
     // Tenant state
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [tenantLoading, setTenantLoading] = useState(true);
     const [tenantNotFound, setTenantNotFound] = useState(false);
+
+    // Check if current user is the owner
+    const isOwner = user?.id === tenant?.owner_id;
 
     // Language State
     const [lang, setLang] = useState<'ar' | 'en'>('en');
@@ -242,6 +249,8 @@ export default function Home() {
                 t={t}
                 tenantName={tenant?.name}
                 primaryColor={primaryColor}
+                tenantSlug={slug}
+                isOwner={isOwner}
             />
 
             <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">
@@ -388,7 +397,11 @@ export default function Home() {
 
             {/* AI Assistant - only show if tenant has API key */}
             {tenant?.gemini_api_key && (
-                <AIAssistant apiKey={tenant.gemini_api_key} />
+                <AIAssistant
+                    apiKey={tenant.gemini_api_key}
+                    knowledgeBase={data}
+                    tenantName={tenant.name}
+                />
             )}
 
             {/* Footer */}

@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { X, Send, Sparkles, User, Bot } from 'lucide-react';
 import { GoogleGenerativeAI } from '@google/generative-ai';
+import { KnowledgeItem } from '../types';
 
 interface Message {
     id: string;
@@ -10,12 +11,14 @@ interface Message {
 
 interface Props {
     apiKey: string;
+    knowledgeBase?: KnowledgeItem[];
+    tenantName?: string;
 }
 
-export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
+export const AIAssistant: React.FC<Props> = ({ apiKey, knowledgeBase = [], tenantName = 'Knowledge Base' }) => {
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([
-        { id: '1', role: 'assistant', text: 'Hello! I am your AI Assistant. How can I help you today?' }
+        { id: '1', role: 'assistant', text: `Hello! I'm your AI Assistant for ${tenantName}. I have access to the knowledge base and can help answer your questions. How can I help you today?` }
     ]);
     const [input, setInput] = useState('');
     const [isLoading, setIsLoading] = useState(false);
@@ -29,6 +32,38 @@ export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
         scrollToBottom();
     }, [messages, isOpen]);
 
+    // Build knowledge base context string
+    const buildKnowledgeContext = (): string => {
+        if (knowledgeBase.length === 0) {
+            return 'No knowledge base content is currently available.';
+        }
+
+        // Group by category for better organization
+        const byCategory: Record<string, KnowledgeItem[]> = {};
+        knowledgeBase.forEach(item => {
+            if (!byCategory[item.category]) {
+                byCategory[item.category] = [];
+            }
+            byCategory[item.category].push(item);
+        });
+
+        let context = `KNOWLEDGE BASE CONTENT FOR ${tenantName.toUpperCase()}:\n\n`;
+
+        Object.entries(byCategory).forEach(([category, items]) => {
+            context += `## ${category}\n`;
+            items.forEach(item => {
+                context += `\nQ: ${item.question}\n`;
+                context += `A: ${item.answer}\n`;
+                if (item.keywords) {
+                    context += `Keywords: ${item.keywords}\n`;
+                }
+            });
+            context += '\n';
+        });
+
+        return context;
+    };
+
     const handleSend = async () => {
         if (!input.trim() || !apiKey) return;
 
@@ -41,11 +76,24 @@ export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
             const genAI = new GoogleGenerativeAI(apiKey);
             const model = genAI.getGenerativeModel({ model: 'gemini-2.5-flash' });
 
-            const prompt = `
-                You are a helpful customer service assistant.
-                User Question: ${input}
-                Answer the question concisely and helpfully.
-            `;
+            const knowledgeContext = buildKnowledgeContext();
+
+            const prompt = `You are a helpful customer service assistant for "${tenantName}". 
+You have access to the following knowledge base content. Use this information to answer user questions accurately.
+If the answer is in the knowledge base, provide it. If not, you can give general helpful advice but mention that it's not from the official knowledge base.
+
+${knowledgeContext}
+
+---
+
+User Question: ${input}
+
+Instructions:
+- Answer based on the knowledge base content above when possible
+- Be concise and helpful
+- If the question relates to content in the knowledge base, quote or reference the relevant information
+- If you're not sure, say so honestly
+- Keep responses friendly and professional`;
 
             const result = await model.generateContent(prompt);
             const response = await result.response;
@@ -53,7 +101,11 @@ export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
             setMessages(prev => [...prev, aiMsg]);
         } catch (error) {
             console.error(error);
-            setMessages(prev => [...prev, { id: Date.now().toString(), role: 'assistant', text: 'Sorry, I am having trouble connecting right now. Please check your API key in settings.' }]);
+            setMessages(prev => [...prev, {
+                id: Date.now().toString(),
+                role: 'assistant',
+                text: 'Sorry, I am having trouble connecting right now. Please check the API key configuration or try again later.'
+            }]);
         } finally {
             setIsLoading(false);
         }
@@ -84,7 +136,7 @@ export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
                                 <h3 className="font-bold text-sm">AI Assistant</h3>
                                 <p className="text-xs text-blue-100 flex items-center gap-1">
                                     <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></span>
-                                    Online
+                                    {knowledgeBase.length > 0 ? `${knowledgeBase.length} articles loaded` : 'Online'}
                                 </p>
                             </div>
                         </div>
@@ -101,7 +153,7 @@ export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
                                     <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-gray-200' : 'bg-blue-100'}`}>
                                         {msg.role === 'user' ? <User className="w-5 h-5 text-gray-500" /> : <Bot className="w-5 h-5 text-blue-600" />}
                                     </div>
-                                    <div className={`p-3 rounded-2xl text-sm ${msg.role === 'user'
+                                    <div className={`p-3 rounded-2xl text-sm whitespace-pre-wrap ${msg.role === 'user'
                                         ? 'bg-blue-600 text-white rounded-tr-none'
                                         : 'bg-white border border-gray-200 text-gray-700 rounded-tl-none shadow-sm'
                                         }`}>
@@ -138,7 +190,7 @@ export const AIAssistant: React.FC<Props> = ({ apiKey }) => {
                             <input
                                 type="text"
                                 className="flex-grow bg-gray-100 border-0 rounded-xl px-4 py-2.5 text-sm focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                                placeholder="Ask a question..."
+                                placeholder="Ask about the knowledge base..."
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
                             />
