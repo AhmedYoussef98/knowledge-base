@@ -1,5 +1,21 @@
+@import "tailwindcss";
+
+/* Custom theme configuration */
+@theme {
+  --font-family-sans: "Tajwal", "Proxima Nova", sans-serif;
+  --font-family-arabic: "Tajwal", sans-serif;
+
+  --color-squad-primary: #281362;
+  --color-squad-orange: #FE6A11;
+  --color-squad-lavender: #A08FF6;
+  --color-squad-softPurple: #C0B8FA;
+  --color-squad-palePurple: #DFDBFF;
+  --color-squad-bg: #F4F3FF;
+  --color-squad-white: #FFFFFF;
+}
+
 body {
-  background-color: #F4F3FF;
+  background-color: var(--color-squad-bg);
 }
 
 /* Custom Scrollbar */
@@ -7,13 +23,16 @@ body {
   width: 8px;
   height: 8px;
 }
+
 ::-webkit-scrollbar-track {
-  background: #F4F3FF;
+  background: var(--color-squad-bg);
 }
+
 ::-webkit-scrollbar-thumb {
-  background: #C0B8FA;
+  background: var(--color-squad-softPurple);
   border-radius: 4px;
 }
+
 ::-webkit-scrollbar-thumb:hover {
-  background: #A08FF6;
+  background: var(--color-squad-lavender);
 }
