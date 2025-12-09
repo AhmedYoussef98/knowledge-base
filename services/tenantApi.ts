@@ -323,3 +323,158 @@ export const generateSlug = (name: string): string => {
         .replace(/[\s_-]+/g, '-')
         .replace(/^-+|-+$/g, '');
 };
+
+// ============================================
+// INVITE FUNCTIONS
+// ============================================
+
+export interface PendingInvite {
+    id: string;
+    tenant_id: string;
+    email: string;
+    role: 'admin' | 'viewer';
+    invited_by: string | null;
+    token: string;
+    expires_at: string;
+    accepted_at: string | null;
+    created_at: string;
+    tenant?: Tenant; // Joined data
+}
+
+export interface AcceptInviteResult {
+    success: boolean;
+    error?: string;
+    already_member?: boolean;
+    tenant_slug?: string;
+    tenant_name?: string;
+    role?: string;
+}
+
+/**
+ * Create an invite for a user by email
+ */
+export const createInvite = async (
+    tenantId: string,
+    email: string,
+    role: 'admin' | 'viewer'
+): Promise<{ data: PendingInvite | null; error: Error | null }> => {
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
+        return { data: null, error: new Error('Not authenticated') };
+    }
+
+    // Check if invite already exists
+    const { data: existing } = await supabase
+        .from('pending_invites')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .eq('email', email.toLowerCase())
+        .is('accepted_at', null)
+        .single();
+
+    if (existing) {
+        // Return existing invite
+        return { data: existing as PendingInvite, error: null };
+    }
+
+    const { data, error } = await supabase
+        .from('pending_invites')
+        .insert([{
+            tenant_id: tenantId,
+            email: email.toLowerCase(),
+            role,
+            invited_by: user.id
+        }])
+        .select()
+        .single();
+
+    return {
+        data: data as PendingInvite | null,
+        error: error as Error | null
+    };
+};
+
+/**
+ * Get invite by token (public access for accept flow)
+ */
+export const getInviteByToken = async (token: string): Promise<PendingInvite | null> => {
+    const { data, error } = await supabase
+        .from('pending_invites')
+        .select('*, tenant:tenants(*)')
+        .eq('token', token)
+        .single();
+
+    if (error) {
+        console.error('Error fetching invite:', error);
+        return null;
+    }
+
+    return data as PendingInvite;
+};
+
+/**
+ * Accept an invite using RPC function
+ */
+export const acceptInvite = async (token: string): Promise<AcceptInviteResult> => {
+    const { data, error } = await supabase.rpc('accept_invite', { p_token: token });
+
+    if (error) {
+        console.error('Error accepting invite:', error);
+        return { success: false, error: error.message };
+    }
+
+    return data as AcceptInviteResult;
+};
+
+/**
+ * Get all pending invites for a tenant (for owner to manage)
+ */
+export const getPendingInvites = async (tenantId: string): Promise<PendingInvite[]> => {
+    const { data, error } = await supabase
+        .from('pending_invites')
+        .select('*')
+        .eq('tenant_id', tenantId)
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error('Error fetching pending invites:', error);
+        return [];
+    }
+
+    return (data || []) as PendingInvite[];
+};
+
+/**
+ * Cancel/delete a pending invite
+ */
+export const cancelInvite = async (inviteId: string): Promise<{ error: Error | null }> => {
+    const { error } = await supabase
+        .from('pending_invites')
+        .delete()
+        .eq('id', inviteId);
+
+    return { error: error as Error | null };
+};
+
+/**
+ * Auto-accept all pending invites for current user
+ */
+export const autoAcceptPendingInvites = async (): Promise<{ accepted_count: number }> => {
+    const { data, error } = await supabase.rpc('auto_accept_pending_invites');
+
+    if (error) {
+        console.error('Error auto-accepting invites:', error);
+        return { accepted_count: 0 };
+    }
+
+    return data as { accepted_count: number };
+};
+
+/**
+ * Generate a full invite URL
+ */
+export const getInviteUrl = (token: string): string => {
+    const baseUrl = window.location.origin;
+    return `${baseUrl}/invite/${token}`;
+};

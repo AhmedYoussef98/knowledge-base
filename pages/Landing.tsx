@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import { useAuth } from '../contexts/AuthContext';
 import {
     Sparkles,
     Search,
@@ -14,12 +15,14 @@ import {
     CheckCircle2,
     MessageSquare,
     BookOpen,
-    Lightbulb
+    Lightbulb,
+    LayoutDashboard
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Landing() {
+    const { user } = useAuth();
     const heroRef = useRef<HTMLDivElement>(null);
     const featuresRef = useRef<HTMLDivElement>(null);
     const howItWorksRef = useRef<HTMLDivElement>(null);
@@ -207,18 +210,30 @@ export default function Landing() {
                             <span className="text-xl font-bold text-gray-900">KnowledgeHub</span>
                         </div>
                         <div className="flex items-center gap-4">
-                            <Link
-                                to="/login"
-                                className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
-                            >
-                                Sign In
-                            </Link>
-                            <Link
-                                to="/signup"
-                                className="px-5 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-all hover:shadow-lg"
-                            >
-                                Get Started Free
-                            </Link>
+                            {user ? (
+                                <Link
+                                    to="/dashboard"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
+                                >
+                                    <LayoutDashboard className="w-4 h-4" />
+                                    Dashboard
+                                </Link>
+                            ) : (
+                                <>
+                                    <Link
+                                        to="/login"
+                                        className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                                    >
+                                        Sign In
+                                    </Link>
+                                    <Link
+                                        to="/signup"
+                                        className="px-5 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-all hover:shadow-lg"
+                                    >
+                                        Get Started Free
+                                    </Link>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

@@ -1,10 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { createTenant, generateSlug, isSlugAvailable, getMyTenant } from '../services/tenantApi';
+import { createTenant, generateSlug, isSlugAvailable } from '../services/tenantApi';
 import {
     BookOpen, Key, Palette, ArrowRight, ArrowLeft, Check,
-    Loader2, AlertCircle, Sparkles, CheckCircle2
+    Loader2, AlertCircle, Sparkles, CheckCircle2, X
 } from 'lucide-react';
 
 type Step = 1 | 2 | 3;
@@ -31,18 +31,7 @@ export default function Onboarding() {
         }
     }, [user, authLoading, navigate]);
 
-    // Check if user already has a tenant
-    useEffect(() => {
-        const checkTenant = async () => {
-            if (user) {
-                const tenant = await getMyTenant();
-                if (tenant) {
-                    navigate(`/kb/${tenant.slug}/admin`);
-                }
-            }
-        };
-        checkTenant();
-    }, [user, navigate]);
+    // Note: Removed the check validitating if user already has a tenant, as we support multiple now
 
     // Auto-generate slug from name
     useEffect(() => {
@@ -154,14 +143,23 @@ export default function Onboarding() {
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-xl">
+            <div className="w-full max-w-xl relative">
+
+                {/* Close Button */}
+                <Link
+                    to="/dashboard"
+                    className="absolute -top-12 right-0 p-2 bg-white/50 hover:bg-white rounded-full transition-colors"
+                    title="Cancel"
+                >
+                    <X className="w-6 h-6 text-gray-600" />
+                </Link>
 
                 {/* Header */}
                 <div className="text-center mb-8">
                     <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
                         <Sparkles className="w-8 h-8 text-white" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900">Set up your Knowledge Base</h1>
+                    <h1 className="text-3xl font-bold text-gray-900">Create New Knowledge Base</h1>
                     <p className="text-gray-600 mt-2">Just a few quick steps to get started</p>
                 </div>
 
@@ -172,10 +170,10 @@ export default function Onboarding() {
                             <React.Fragment key={s.num}>
                                 <div
                                     className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${step === s.num
-                                            ? 'bg-blue-600 text-white'
-                                            : step > s.num
-                                                ? 'bg-green-100 text-green-700'
-                                                : 'bg-gray-100 text-gray-400'
+                                        ? 'bg-blue-600 text-white'
+                                        : step > s.num
+                                            ? 'bg-green-100 text-green-700'
+                                            : 'bg-gray-100 text-gray-400'
                                         }`}
                                 >
                                     {step > s.num ? (
@@ -224,8 +222,8 @@ export default function Onboarding() {
                                         value={slug}
                                         onChange={(e) => handleSlugChange(e.target.value)}
                                         className={`flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${slugAvailable === true ? 'border-green-300 bg-green-50' :
-                                                slugAvailable === false ? 'border-red-300 bg-red-50' :
-                                                    'border-gray-200'
+                                            slugAvailable === false ? 'border-red-300 bg-red-50' :
+                                                'border-gray-200'
                                             }`}
                                         placeholder="my-company"
                                     />
@@ -288,8 +286,8 @@ export default function Onboarding() {
                                             key={color}
                                             onClick={() => setPrimaryColor(color)}
                                             className={`w-10 h-10 rounded-full transition-all ${primaryColor === color
-                                                    ? 'ring-4 ring-offset-2 ring-blue-400 scale-110'
-                                                    : 'hover:scale-105'
+                                                ? 'ring-4 ring-offset-2 ring-blue-400 scale-110'
+                                                : 'hover:scale-105'
                                                 }`}
                                             style={{ backgroundColor: color }}
                                         />

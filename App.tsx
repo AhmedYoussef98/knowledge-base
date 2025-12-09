@@ -11,6 +11,8 @@ import Login from './pages/Login';
 import Onboarding from './pages/Onboarding';
 import Settings from './pages/Settings';
 import Landing from './pages/Landing';
+import Dashboard from './pages/Dashboard';
+import AcceptInvite from './pages/AcceptInvite';
 
 export default function App() {
   return (
@@ -24,15 +26,25 @@ export default function App() {
             {/* Auth routes */}
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+
+            {/* User dashboard (central hub) */}
+            <Route path="/dashboard" element={<Dashboard />} />
+
+            {/* KB creation */}
             <Route path="/onboarding" element={<Onboarding />} />
+
+            {/* Owner settings */}
             <Route path="/settings" element={<Settings />} />
+
+            {/* Invite acceptance */}
+            <Route path="/invite/:token" element={<AcceptInvite />} />
 
             {/* Tenant-specific routes */}
             <Route path="/kb/:slug" element={<Home />} />
             <Route path="/kb/:slug/admin" element={<Admin />} />
 
-            {/* Legacy routes - redirect to landing */}
-            <Route path="/admin" element={<Navigate to="/login" replace />} />
+            {/* Legacy routes - redirect to dashboard */}
+            <Route path="/admin" element={<Navigate to="/dashboard" replace />} />
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />

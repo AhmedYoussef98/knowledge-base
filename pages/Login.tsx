@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { userHasTenant } from '../services/tenantApi';
+import { autoAcceptPendingInvites } from '../services/tenantApi';
 import { Mail, Lock, LogIn, Loader2, AlertCircle, Sparkles } from 'lucide-react';
 
 export default function Login() {
@@ -9,8 +9,31 @@ export default function Login() {
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signIn } = useAuth();
+    const { signIn, user } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    // Get return URL from query params
+    const returnTo = searchParams.get('returnTo');
+
+    // If already logged in, redirect
+    useEffect(() => {
+        if (user) {
+            handlePostLogin();
+        }
+    }, [user]);
+
+    const handlePostLogin = async () => {
+        // Auto-accept any pending invites for this user
+        await autoAcceptPendingInvites();
+
+        // Redirect to returnTo or dashboard
+        if (returnTo) {
+            navigate(returnTo);
+        } else {
+            navigate('/dashboard');
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -25,14 +48,14 @@ export default function Login() {
             return;
         }
 
-        // Check if user has a tenant
-        const hasTenant = await userHasTenant();
+        // The useEffect will handle redirect when user state updates
+    };
 
-        if (hasTenant) {
-            navigate('/settings');
-        } else {
-            navigate('/onboarding');
+    const getSignUpLink = () => {
+        if (returnTo) {
+            return `/signup?returnTo=${encodeURIComponent(returnTo)}`;
         }
+        return '/signup';
     };
 
     return (
@@ -40,11 +63,13 @@ export default function Login() {
             <div className="w-full max-w-md">
                 {/* Logo/Brand */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
-                        <Sparkles className="w-8 h-8 text-white" />
-                    </div>
+                    <Link to="/" className="inline-block">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
+                            <Sparkles className="w-8 h-8 text-white" />
+                        </div>
+                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900">Welcome back</h1>
-                    <p className="text-gray-600 mt-2">Sign in to manage your knowledge base</p>
+                    <p className="text-gray-600 mt-2">Sign in to manage your knowledge bases</p>
                 </div>
 
                 {/* Form Card */}
@@ -110,10 +135,17 @@ export default function Login() {
                     {/* Sign Up Link */}
                     <div className="mt-6 text-center text-sm text-gray-600">
                         Don't have an account?{' '}
-                        <Link to="/signup" className="text-blue-600 hover:underline font-medium">
+                        <Link to={getSignUpLink()} className="text-blue-600 hover:underline font-medium">
                             Create one
                         </Link>
                     </div>
+                </div>
+
+                {/* Back to Home */}
+                <div className="text-center mt-6">
+                    <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                        ← Back to home
+                    </Link>
                 </div>
             </div>
         </div>

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { userHasTenant } from '../services/tenantApi';
-import { Mail, Lock, UserPlus, Loader2, AlertCircle, Sparkles } from 'lucide-react';
+import { autoAcceptPendingInvites } from '../services/tenantApi';
+import { Mail, Lock, UserPlus, Loader2, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
 
 export default function SignUp() {
     const [email, setEmail] = useState('');
@@ -10,8 +10,32 @@ export default function SignUp() {
     const [confirmPassword, setConfirmPassword] = useState('');
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
-    const { signUp } = useAuth();
+    const [emailSent, setEmailSent] = useState(false);
+    const { signUp, user } = useAuth();
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+
+    // Get return URL from query params
+    const returnTo = searchParams.get('returnTo');
+
+    // If already logged in, redirect
+    useEffect(() => {
+        if (user) {
+            handlePostSignup();
+        }
+    }, [user]);
+
+    const handlePostSignup = async () => {
+        // Auto-accept any pending invites for this user
+        await autoAcceptPendingInvites();
+
+        // Redirect to returnTo or dashboard
+        if (returnTo) {
+            navigate(returnTo);
+        } else {
+            navigate('/dashboard');
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,31 +55,74 @@ export default function SignUp() {
         const { error: signUpError } = await signUp(email, password);
 
         if (signUpError) {
-            setError(signUpError.message);
+            // Check if it's an email confirmation message
+            if (signUpError.message.includes('confirm') || signUpError.message.includes('email')) {
+                setEmailSent(true);
+            } else {
+                setError(signUpError.message);
+            }
             setLoading(false);
             return;
         }
 
-        // Check if user already has a tenant (unlikely for new signup)
-        const hasTenant = await userHasTenant();
-
-        if (hasTenant) {
-            navigate('/settings');
-        } else {
-            navigate('/onboarding');
-        }
+        // If signup was successful and user is immediately logged in
+        // (email confirmation disabled), redirect
+        // Otherwise the useEffect will handle it when user state updates
+        setLoading(false);
     };
+
+    const getLoginLink = () => {
+        if (returnTo) {
+            return `/login?returnTo=${encodeURIComponent(returnTo)}`;
+        }
+        return '/login';
+    };
+
+    // Email confirmation sent
+    if (emailSent) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
+                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <CheckCircle2 className="w-8 h-8 text-green-500" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h1>
+                        <p className="text-gray-600 mb-6">
+                            We've sent a confirmation link to <strong>{email}</strong>
+                        </p>
+                        <p className="text-sm text-gray-500 mb-8">
+                            Click the link in the email to activate your account, then come back and sign in.
+                        </p>
+                        <Link
+                            to={getLoginLink()}
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+                        >
+                            Go to Sign In
+                        </Link>
+                    </div>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* Logo/Brand */}
                 <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
-                        <Sparkles className="w-8 h-8 text-white" />
-                    </div>
+                    <Link to="/" className="inline-block">
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
+                            <Sparkles className="w-8 h-8 text-white" />
+                        </div>
+                    </Link>
                     <h1 className="text-3xl font-bold text-gray-900">Create your account</h1>
-                    <p className="text-gray-600 mt-2">Start building your knowledge base in minutes</p>
+                    <p className="text-gray-600 mt-2">
+                        {returnTo?.includes('invite')
+                            ? 'Sign up to accept your invitation'
+                            : 'Start building your knowledge base in minutes'
+                        }
+                    </p>
                 </div>
 
                 {/* Form Card */}
@@ -137,7 +204,7 @@ export default function SignUp() {
                     {/* Login Link */}
                     <div className="mt-6 text-center text-sm text-gray-600">
                         Already have an account?{' '}
-                        <Link to="/login" className="text-blue-600 hover:underline font-medium">
+                        <Link to={getLoginLink()} className="text-blue-600 hover:underline font-medium">
                             Sign in
                         </Link>
                     </div>
@@ -147,6 +214,13 @@ export default function SignUp() {
                 <p className="text-center text-xs text-gray-500 mt-6">
                     By signing up, you agree to our Terms of Service and Privacy Policy.
                 </p>
+
+                {/* Back to Home */}
+                <div className="text-center mt-4">
+                    <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
+                        ← Back to home
+                    </Link>
+                </div>
             </div>
         </div>
     );

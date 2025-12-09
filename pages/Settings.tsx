@@ -7,17 +7,21 @@ import {
     generateSlug,
     isSlugAvailable,
     getTenantMembers,
-    addTenantMemberById,
     updateMemberRole,
     removeTenantMember,
-    TenantMember
+    createInvite,
+    getPendingInvites,
+    cancelInvite,
+    getInviteUrl,
+    TenantMember,
+    PendingInvite
 } from '../services/tenantApi';
-import { supabase } from '../services/supabase';
 import { Tenant } from '../contexts/TenantContext';
 import {
-    Settings as SettingsIcon, Key, Palette, Globe, Save,
+    Key, Palette, Globe, Save,
     Loader2, AlertCircle, CheckCircle2, LogOut, ExternalLink,
-    Users, UserPlus, Trash2, Shield, Eye, Crown
+    Users, UserPlus, Trash2, Shield, Eye, Crown, Copy, Link as LinkIcon,
+    Clock, X, LayoutDashboard
 } from 'lucide-react';
 
 export default function Settings() {
@@ -39,12 +43,14 @@ export default function Settings() {
 
     // Team management
     const [members, setMembers] = useState<TenantMember[]>([]);
+    const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
     const [loadingMembers, setLoadingMembers] = useState(false);
     const [newMemberEmail, setNewMemberEmail] = useState('');
     const [newMemberRole, setNewMemberRole] = useState<'admin' | 'viewer'>('viewer');
-    const [addingMember, setAddingMember] = useState(false);
-    const [memberError, setMemberError] = useState('');
-    const [memberSuccess, setMemberSuccess] = useState('');
+    const [creatingInvite, setCreatingInvite] = useState(false);
+    const [inviteError, setInviteError] = useState('');
+    const [inviteSuccess, setInviteSuccess] = useState('');
+    const [copiedInviteId, setCopiedInviteId] = useState<string | null>(null);
 
     useEffect(() => {
         if (!authLoading && !user) {
@@ -64,10 +70,11 @@ export default function Settings() {
                     setApiKey(myTenant.gemini_api_key || '');
                     setPrimaryColor(myTenant.primary_color || '#F97316');
 
-                    // Fetch team members
+                    // Fetch team members and invites
                     fetchMembers(myTenant.id);
+                    fetchInvites(myTenant.id);
                 } else {
-                    navigate('/onboarding');
+                    navigate('/dashboard');
                 }
                 setLoading(false);
             }
@@ -82,48 +89,51 @@ export default function Settings() {
         setLoadingMembers(false);
     };
 
-    const handleAddMember = async () => {
+    const fetchInvites = async (tenantId: string) => {
+        const invites = await getPendingInvites(tenantId);
+        setPendingInvites(invites.filter(i => !i.accepted_at && new Date(i.expires_at) > new Date()));
+    };
+
+    const handleCreateInvite = async () => {
         if (!tenant || !newMemberEmail.trim()) return;
 
-        setMemberError('');
-        setMemberSuccess('');
-        setAddingMember(true);
+        setInviteError('');
+        setInviteSuccess('');
+        setCreatingInvite(true);
 
-        try {
-            // Look up user by email
-            const { data, error: lookupError } = await supabase
-                .from('auth.users')
-                .select('id')
-                .eq('email', newMemberEmail.trim())
-                .single();
+        const { data: invite, error: inviteErr } = await createInvite(
+            tenant.id,
+            newMemberEmail.trim(),
+            newMemberRole
+        );
 
-            if (lookupError || !data) {
-                // Try using the auth API to find the user
-                // For now, show an error that the user must sign up first
-                setMemberError('User not found. They must sign up first, then you can add them by their email.');
-                setAddingMember(false);
-                return;
-            }
-
-            const { error: addError } = await addTenantMemberById(tenant.id, data.id, newMemberRole);
-
-            if (addError) {
-                if (addError.message.includes('duplicate')) {
-                    setMemberError('This user is already a team member.');
-                } else {
-                    setMemberError(addError.message);
-                }
-            } else {
-                setMemberSuccess('Team member added successfully!');
-                setNewMemberEmail('');
-                fetchMembers(tenant.id);
-                setTimeout(() => setMemberSuccess(''), 3000);
-            }
-        } catch (err: any) {
-            setMemberError('Failed to add member. The user may not exist yet.');
+        if (inviteErr) {
+            setInviteError(inviteErr.message);
+        } else if (invite) {
+            setInviteSuccess('Invite created! Copy the link and send it to the user.');
+            setNewMemberEmail('');
+            fetchInvites(tenant.id);
+            // Auto-copy to clipboard
+            const url = getInviteUrl(invite.token);
+            navigator.clipboard.writeText(url);
+            setCopiedInviteId(invite.id);
+            setTimeout(() => setCopiedInviteId(null), 3000);
         }
 
-        setAddingMember(false);
+        setCreatingInvite(false);
+    };
+
+    const handleCopyInviteLink = async (invite: PendingInvite) => {
+        const url = getInviteUrl(invite.token);
+        await navigator.clipboard.writeText(url);
+        setCopiedInviteId(invite.id);
+        setTimeout(() => setCopiedInviteId(null), 3000);
+    };
+
+    const handleCancelInvite = async (inviteId: string) => {
+        if (!confirm('Cancel this invite?')) return;
+        await cancelInvite(inviteId);
+        if (tenant) fetchInvites(tenant.id);
     };
 
     const handleUpdateRole = async (memberId: string, role: 'admin' | 'viewer') => {
@@ -179,7 +189,7 @@ export default function Settings() {
 
     const handleSignOut = async () => {
         await signOut();
-        navigate('/login');
+        navigate('/');
     };
 
     const colors = [
@@ -214,11 +224,18 @@ export default function Settings() {
                     </div>
                     <div className="flex items-center gap-3">
                         <Link
-                            to={`/kb/${slug}/admin`}
+                            to="/dashboard"
+                            className="px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors font-medium text-sm flex items-center gap-2"
+                        >
+                            <LayoutDashboard className="w-4 h-4" />
+                            Dashboard
+                        </Link>
+                        <Link
+                            to={`/kb/${slug}`}
                             className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors font-medium text-sm flex items-center gap-2"
                         >
                             <ExternalLink className="w-4 h-4" />
-                            Admin Panel
+                            View KB
                         </Link>
                         <button
                             onClick={handleSignOut}
@@ -312,7 +329,7 @@ export default function Settings() {
                                             }
                                         </div>
                                         <div>
-                                            <p className="font-medium text-gray-900">{member.user_id.slice(0, 8)}...</p>
+                                            <p className="font-medium text-gray-900">{member.email || member.user_id.slice(0, 8) + '...'}</p>
                                             <p className="text-sm text-gray-500 capitalize">{member.role}</p>
                                         </div>
                                     </div>
@@ -336,28 +353,70 @@ export default function Settings() {
                                 </div>
                             ))}
                         </div>
-                    ) : (
-                        <p className="text-gray-500 text-sm mb-6">No team members yet. Add members below.</p>
+                    ) : null}
+
+                    {/* Pending Invites */}
+                    {pendingInvites.length > 0 && (
+                        <div className="mb-6">
+                            <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
+                                <Clock className="w-4 h-4" />
+                                Pending Invites
+                            </h3>
+                            <div className="space-y-2">
+                                {pendingInvites.map(invite => (
+                                    <div key={invite.id} className="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                                                <LinkIcon className="w-4 h-4 text-yellow-600" />
+                                            </div>
+                                            <div>
+                                                <p className="font-medium text-gray-900 text-sm">{invite.email}</p>
+                                                <p className="text-xs text-gray-500 capitalize">{invite.role} • Expires {new Date(invite.expires_at).toLocaleDateString()}</p>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-2">
+                                            <button
+                                                onClick={() => handleCopyInviteLink(invite)}
+                                                className={`p-2 rounded-lg transition-colors ${copiedInviteId === invite.id
+                                                        ? 'bg-green-100 text-green-600'
+                                                        : 'text-gray-500 hover:bg-gray-100'
+                                                    }`}
+                                                title="Copy invite link"
+                                            >
+                                                {copiedInviteId === invite.id ? <CheckCircle2 className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                            </button>
+                                            <button
+                                                onClick={() => handleCancelInvite(invite.id)}
+                                                className="p-2 text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                                                title="Cancel invite"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
                     )}
 
-                    {/* Add member form */}
+                    {/* Create invite form */}
                     <div className="border-t border-gray-100 pt-6">
                         <h3 className="text-sm font-medium text-gray-700 mb-3 flex items-center gap-2">
                             <UserPlus className="w-4 h-4" />
-                            Add Team Member
+                            Invite Team Member
                         </h3>
 
-                        {memberError && (
+                        {inviteError && (
                             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm mb-4">
                                 <AlertCircle className="w-4 h-4 flex-shrink-0" />
-                                <span>{memberError}</span>
+                                <span>{inviteError}</span>
                             </div>
                         )}
 
-                        {memberSuccess && (
+                        {inviteSuccess && (
                             <div className="flex items-center gap-2 p-3 bg-green-50 border border-green-200 rounded-lg text-green-700 text-sm mb-4">
                                 <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                                <span>{memberSuccess}</span>
+                                <span>{inviteSuccess}</span>
                             </div>
                         )}
 
@@ -378,22 +437,22 @@ export default function Settings() {
                                 <option value="admin">Admin</option>
                             </select>
                             <button
-                                onClick={handleAddMember}
-                                disabled={addingMember || !newMemberEmail.trim()}
+                                onClick={handleCreateInvite}
+                                disabled={creatingInvite || !newMemberEmail.trim()}
                                 className="px-4 py-2.5 bg-blue-600 text-white font-medium rounded-xl hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
                             >
-                                {addingMember ? (
+                                {creatingInvite ? (
                                     <Loader2 className="w-4 h-4 animate-spin" />
                                 ) : (
                                     <>
-                                        <UserPlus className="w-4 h-4" />
-                                        Add
+                                        <LinkIcon className="w-4 h-4" />
+                                        Create Link
                                     </>
                                 )}
                             </button>
                         </div>
                         <p className="text-xs text-gray-500 mt-2">
-                            The user must have signed up first. Enter their email to add them to your team.
+                            A unique invite link will be created. Share it with the user to let them join your team.
                         </p>
                     </div>
                 </div>
