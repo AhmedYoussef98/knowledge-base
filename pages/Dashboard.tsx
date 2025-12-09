@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { gsap } from 'gsap';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { getMyTenants, autoAcceptPendingInvites, getUserTenantRole, UserRole } from '../services/tenantApi';
@@ -22,10 +23,7 @@ export default function Dashboard() {
     const containerRef = React.useRef<HTMLDivElement>(null);
     const hasAnimated = React.useRef(false);
 
-    // Import gsap dynamically or assume available via window if script, but better to import
-    // Note: User installed it via npm
-    const { gsap } = require('gsap'); // Using require to avoid import issues if not fully set up types in this context, but import is better. 
-    // Actually, stick to ES6 import as per user request example: import { gsap } from "gsap"; 
+
 
     useEffect(() => {
         if (!authLoading && !user) {
