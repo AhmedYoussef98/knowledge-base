@@ -108,7 +108,8 @@ export const TenantProvider: React.FC<TenantProviderProps> = ({ children }) => {
                     .from('tenants')
                     .select('*')
                     .eq('owner_id', user.id)
-                    .single();
+                    .limit(1)
+                    .maybeSingle();
 
                 if (data) {
                     setCurrentTenant(data as Tenant);

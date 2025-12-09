@@ -2,8 +2,8 @@
 
 /* Custom theme configuration */
 @theme {
-  --font-family-sans: "Tajwal", "Proxima Nova", sans-serif;
-  --font-family-arabic: "Tajwal", sans-serif;
+  --font-family-sans: "Tajawal", "Proxima Nova", sans-serif;
+  --font-family-arabic: "Tajawal", sans-serif;
 
   --color-squad-primary: #281362;
   --color-squad-orange: #FE6A11;
