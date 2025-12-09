@@ -1,4 +1,5 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
+import { gsap } from 'gsap';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { autoAcceptPendingInvites } from '../services/tenantApi';
@@ -11,9 +12,26 @@ export default function SignUp() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
+    const [existingUser, setExistingUser] = useState(false);
     const { signUp, user } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
+
+    const containerRef = useRef<HTMLDivElement>(null);
+    const formRef = useRef<HTMLDivElement>(null);
+
+    // Animation
+    useEffect(() => {
+        const ctx = gsap.context(() => {
+            gsap.from(formRef.current, {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                ease: "power2.out"
+            });
+        }, containerRef);
+        return () => ctx.revert();
+    }, []);
 
     // Get return URL from query params
     const returnTo = searchParams.get('returnTo');
@@ -52,22 +70,32 @@ export default function SignUp() {
         }
 
         setLoading(true);
-        const { error: signUpError } = await signUp(email, password);
+        const { data, error: signUpError } = await signUp(email, password);
 
         if (signUpError) {
-            // Check if it's an email confirmation message
-            if (signUpError.message.includes('confirm') || signUpError.message.includes('email')) {
-                setEmailSent(true);
-            } else {
+            console.log("Signup error:", signUpError.message);
+            // Handle existing user specifically
+            if (signUpError.message.toLowerCase().includes('already registered')) {
+                setExistingUser(true);
+            }
+            // Check for rate limits or other specific errors
+            else if (signUpError.message.includes('rate limit')) {
+                setError('Too many requests. Please try again later.');
+            }
+            else {
                 setError(signUpError.message);
             }
             setLoading(false);
             return;
         }
 
-        // If signup was successful and user is immediately logged in
-        // (email confirmation disabled), redirect
-        // Otherwise the useEffect will handle it when user state updates
+        // If data.session is null, it means email confirmation is required (and enabled)
+        // If data.session is present, they are logged in (auto-confirm or disabled)
+        if (data && !data.session && data.user) {
+            setEmailSent(true);
+        }
+
+        // If session exists, the useEffect watching 'user' will handle the redirect
         setLoading(false);
     };
 
@@ -106,8 +134,39 @@ export default function SignUp() {
         );
     }
 
+    // Existing User Found
+    if (existingUser) {
+        return (
+            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
+                <div className="w-full max-w-md">
+                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in-up">
+                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <Sparkles className="w-8 h-8 text-blue-600" />
+                        </div>
+                        <h1 className="text-2xl font-bold text-gray-900 mb-2">You already have an account</h1>
+                        <p className="text-gray-600 mb-8">
+                            The email <strong>{email}</strong> is already registered.
+                        </p>
+                        <Link
+                            to={getLoginLink()}
+                            className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all w-full justify-center"
+                        >
+                            Sign In Instead
+                        </Link>
+                        <button
+                            onClick={() => setExistingUser(false)}
+                            className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
+                        >
+                            Use a different email
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
+        <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
             <div className="w-full max-w-md">
                 {/* Logo/Brand */}
                 <div className="text-center mb-8">
@@ -126,7 +185,7 @@ export default function SignUp() {
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div ref={formRef} className="bg-white rounded-2xl shadow-xl p-8">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email */}
                         <div>
