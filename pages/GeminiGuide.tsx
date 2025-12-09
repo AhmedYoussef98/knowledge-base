@@ -15,22 +15,28 @@ export default function GeminiGuide() {
     useEffect(() => {
         const ctx = gsap.context(() => {
             // Header Animation
-            gsap.from(headerRef.current, {
-                y: -50,
-                opacity: 0,
-                duration: 1,
-                ease: "power3.out"
-            });
+            gsap.fromTo(headerRef.current,
+                { y: -50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 1,
+                    ease: "power3.out"
+                }
+            );
 
             // Steps Stagger Animation
-            gsap.from(".step-card", {
-                y: 50,
-                opacity: 0,
-                duration: 0.8,
-                stagger: 0.2,
-                ease: "back.out(1.7)",
-                delay: 0.3
-            });
+            gsap.fromTo(".step-card",
+                { y: 50, opacity: 0 },
+                {
+                    y: 0,
+                    opacity: 1,
+                    duration: 0.8,
+                    stagger: 0.2,
+                    ease: "back.out(1.7)",
+                    delay: 0.3
+                }
+            );
 
             // Floating elements background
             gsap.to(".floating-bg", {
@@ -119,7 +125,7 @@ export default function GeminiGuide() {
                     {steps.map((step, index) => (
                         <div
                             key={index}
-                            className="step-card group bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-200 transition-all duration-300 relative overflow-hidden"
+                            className="step-card group bg-white p-8 rounded-2xl shadow-sm border border-slate-200 hover:shadow-xl hover:border-blue-200 transition-shadow duration-300 relative overflow-hidden"
                         >
                             {/* Step Number Background */}
                             <div className="absolute -right-4 -top-4 text-9xl font-bold text-slate-50 opacity-50 select-none group-hover:text-blue-50 transition-colors">
