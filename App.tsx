@@ -2,6 +2,7 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './contexts/AuthContext';
 import { TenantProvider } from './contexts/TenantContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 // Pages
 import Home from './pages/Home';
@@ -20,9 +21,10 @@ import UpdatePassword from './pages/UpdatePassword';
 export default function App() {
   return (
     <Router>
-      <AuthProvider>
-        <TenantProvider>
-          <Routes>
+      <LanguageProvider>
+        <AuthProvider>
+          <TenantProvider>
+            <Routes>
             {/* Public landing */}
             <Route path="/" element={<Landing />} />
 
@@ -56,9 +58,10 @@ export default function App() {
 
             {/* Catch-all */}
             <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </TenantProvider>
-      </AuthProvider>
+            </Routes>
+          </TenantProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </Router>
   );
 }

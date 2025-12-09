@@ -1,7 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
-import { Lock, Loader2, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
+import { Lock, Loader2, AlertCircle, CircuitBoard, CheckCircle2, Globe } from 'lucide-react';
 import { gsap } from 'gsap';
 
 export default function UpdatePassword() {
@@ -10,20 +12,12 @@ export default function UpdatePassword() {
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { updatePassword, user } = useAuth();
+    const { language, toggleLanguage, isRTL } = useLanguage();
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const containerRef = useRef<HTMLDivElement>(null);
     const cardRef = useRef<HTMLDivElement>(null);
-
-    // Initial check: must be logged in (via recovery link)
-    // We rely on AuthProvider handling the hash fragment automatically
-    useEffect(() => {
-        // If we want to be strict, we can check if the session type is recovery, 
-        // but Supabase JS just logs them in.
-        // If not logged in after a short delay (for auth state to settle), redirect.
-        // But useAuth loading handles the wait usually.
-        // We'll let the user update password if they are logged in.
-    }, []);
 
     useEffect(() => {
         const ctx = gsap.context(() => {
@@ -42,12 +36,12 @@ export default function UpdatePassword() {
         setError('');
 
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
             return;
         }
 
         if (password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setError(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters');
             return;
         }
 
@@ -67,18 +61,25 @@ export default function UpdatePassword() {
     if (!user) {
         // If accessed directly without a link, or link expired
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
-                <div className="bg-white rounded-xl shadow-lg p-8 max-w-md w-full text-center">
-                    <AlertCircle className="w-12 h-12 text-yellow-500 mx-auto mb-4" />
-                    <h2 className="text-xl font-bold text-gray-900 mb-2">Invalid or Expired Link</h2>
-                    <p className="text-gray-600 mb-6">
-                        This password reset link is invalid or has expired. Please request a new one.
+            <div className="min-h-screen flex items-center justify-center bg-daleel-deep-space circuit-pattern p-4 relative">
+                {/* Background gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/5 via-daleel-deep-space to-daleel-neon/5 -z-10" />
+
+                <div className="bg-daleel-tech-slate rounded-xl shadow-lg border border-daleel-cyan/30 p-8 max-w-md w-full text-center">
+                    <AlertCircle className="w-12 h-12 text-daleel-neon mx-auto mb-4" />
+                    <h2 className="text-xl font-bold text-daleel-pure-light mb-2" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                        {language === 'ar' ? 'رابط غير صالح أو منتهي الصلاحية' : 'Invalid or Expired Link'}
+                    </h2>
+                    <p className="text-daleel-pure-light/70 mb-6">
+                        {language === 'ar'
+                            ? 'رابط إعادة تعيين كلمة المرور هذا غير صالح أو انتهت صلاحيته. يرجى طلب رابط جديد.'
+                            : 'This password reset link is invalid or has expired. Please request a new one.'}
                     </p>
                     <button
                         onClick={() => navigate('/forgot-password')}
-                        className="text-blue-600 font-medium hover:underline"
+                        className="text-daleel-cyan font-medium hover:text-daleel-neon transition-colors"
                     >
-                        Go to Forgot Password
+                        {language === 'ar' ? 'اذهب إلى نسيت كلمة المرور' : 'Go to Forgot Password'}
                     </button>
                 </div>
             </div>
@@ -86,30 +87,54 @@ export default function UpdatePassword() {
     }
 
     return (
-        <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
+        <div ref={containerRef} className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4 relative">
+            {/* Background gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/5 via-daleel-deep-space to-daleel-green/5 -z-10" />
+            <div className="absolute top-20 left-10 w-96 h-96 bg-daleel-green/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-daleel-cyan/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+
+            <div className="w-full max-w-md relative z-10">
+                {/* Language Toggle - Top Right */}
+                <div className={`absolute -top-16 ${isRTL ? 'left-0' : 'right-0'}`}>
+                    <button
+                        onClick={toggleLanguage}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-daleel-neon/10 hover:bg-daleel-neon/20 transition-all text-sm border border-daleel-neon/30 hover:border-daleel-neon glow-hover text-daleel-pure-light"
+                    >
+                        <Globe size={14} />
+                        <span className="font-bold">{language === 'ar' ? 'EN' : 'ع'}</span>
+                    </button>
+                </div>
+
                 {/* Logo/Brand */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
-                        <Sparkles className="w-8 h-8 text-white" />
+                <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-green/20 border-2 border-daleel-green rounded-2xl shadow-lg mb-4 glow-neon">
+                        <CircuitBoard className="w-8 h-8 text-daleel-green" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900">Set New Password</h1>
-                    <p className="text-gray-600 mt-2">Create a new secure password for your account</p>
+                    <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                        {language === 'ar' ? 'تعيين كلمة مرور جديدة' : 'Set New Password'}
+                    </h1>
+                    <p className="text-daleel-pure-light/70 mt-2">
+                        {language === 'ar'
+                            ? 'أنشئ كلمة مرور آمنة جديدة لحسابك'
+                            : 'Create a new secure password for your account'}
+                    </p>
                 </div>
 
                 {/* Form Card */}
-                <div ref={cardRef} className="bg-white rounded-2xl shadow-xl p-8">
+                <div ref={cardRef} className="bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-green/20 p-8 glow-cyan">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* New Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">New Password</label>
+                            <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                {t('auth.newPassword')}
+                            </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Lock className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-5 h-5 text-daleel-green`} />
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-green/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
                                     placeholder="••••••••"
                                     required
                                 />
@@ -118,14 +143,16 @@ export default function UpdatePassword() {
 
                         {/* Confirm Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                {t('auth.confirmPassword')}
+                            </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Lock className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-5 h-5 text-daleel-green`} />
                                 <input
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-green/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
                                     placeholder="••••••••"
                                     required
                                 />
@@ -134,7 +161,7 @@ export default function UpdatePassword() {
 
                         {/* Error Message */}
                         {error && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                            <div className={`flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                                 <span>{error}</span>
                             </div>
@@ -144,14 +171,14 @@ export default function UpdatePassword() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-daleel-green text-daleel-deep-space font-semibold rounded-xl hover:bg-daleel-neon transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 glow-neon"
                         >
                             {loading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
                                     <CheckCircle2 className="w-5 h-5" />
-                                    Update Password
+                                    {t('auth.updatePassword')}
                                 </>
                             )}
                         </button>

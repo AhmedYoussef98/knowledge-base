@@ -2,11 +2,10 @@ import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Globe, Home, Settings, LogOut, Shield, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
 
 interface Props {
-  lang: 'ar' | 'en';
-  toggleLang: () => void;
-  t: (key: string) => string;
   tenantName?: string;
   primaryColor?: string;
   tenantSlug?: string;
@@ -14,16 +13,15 @@ interface Props {
 }
 
 export const Navbar: React.FC<Props> = ({
-  lang,
-  toggleLang,
-  t,
   tenantName,
-  primaryColor = '#1E293B',
+  primaryColor = '#0F172A',
   tenantSlug,
   isAdmin = false
 }) => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
+  const { language, toggleLanguage } = useLanguage();
+  const { t } = useTranslation();
 
   const handleSignOut = async () => {
     await signOut();
@@ -40,7 +38,7 @@ export const Navbar: React.FC<Props> = ({
 
   return (
     <nav
-      className="text-white shadow-lg sticky top-0 z-50"
+      className="text-daleel-pure-light shadow-lg sticky top-0 z-50 border-b border-daleel-cyan/20"
       style={{ backgroundColor: primaryColor }}
     >
       <div className="container mx-auto px-4 py-3 flex items-center justify-between">
@@ -48,16 +46,18 @@ export const Navbar: React.FC<Props> = ({
           {/* Dynamic tenant logo or initial */}
           <Link
             to={getHomeLink()}
-            className="h-10 w-10 rounded-xl flex items-center justify-center text-lg font-bold hover:scale-105 transition-transform"
-            style={{ backgroundColor: 'rgba(255,255,255,0.2)' }}
+            className="h-10 w-10 rounded-xl flex items-center justify-center text-lg font-bold hover:scale-105 transition-transform glow-cyan"
+            style={{ backgroundColor: 'rgba(163, 255, 71, 0.2)' }}
           >
-            {tenantName ? tenantName.charAt(0).toUpperCase() : 'K'}
+            {tenantName ? tenantName.charAt(0).toUpperCase() : 'د'}
           </Link>
           <div className="hidden sm:block">
             <Link to={getHomeLink()}>
-              <h1 className="font-bold text-lg hover:opacity-90 transition-opacity">{tenantName || 'Knowledge Base'}</h1>
+              <h1 className="font-bold text-lg hover:opacity-90 transition-opacity">
+                {tenantName || t('brand.name')}
+              </h1>
             </Link>
-            <p className="text-xs opacity-75 mt-0.5">{t('navSubtitle')}</p>
+            <p className="text-xs opacity-75 mt-0.5">{t('brand.tagline')}</p>
           </div>
         </div>
 
@@ -68,11 +68,11 @@ export const Navbar: React.FC<Props> = ({
             {user && (
               <Link
                 to="/dashboard"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm border border-white/20"
-                title="Dashboard"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-daleel-cyan/20 transition-all text-sm border border-daleel-cyan/30 hover:border-daleel-cyan/60"
+                title={t('dashboard.title')}
               >
                 <LayoutDashboard size={14} />
-                <span className="hidden md:inline font-medium">Dashboard</span>
+                <span className="hidden md:inline font-medium">{t('dashboard.title')}</span>
               </Link>
             )}
 
@@ -80,11 +80,11 @@ export const Navbar: React.FC<Props> = ({
             {tenantSlug && (
               <Link
                 to={`/kb/${tenantSlug}`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm border border-white/20"
-                title="Knowledge Base"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-daleel-cyan/20 transition-all text-sm border border-daleel-cyan/30 hover:border-daleel-cyan/60"
+                title={t('kb.searchPlaceholder')}
               >
                 <Home size={14} />
-                <span className="hidden md:inline font-medium">KB Home</span>
+                <span className="hidden md:inline font-medium">{t('common.back')}</span>
               </Link>
             )}
 
@@ -92,11 +92,11 @@ export const Navbar: React.FC<Props> = ({
             {isAdmin && tenantSlug && (
               <Link
                 to={`/kb/${tenantSlug}/admin`}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm border border-white/20"
-                title="Admin Panel"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-daleel-cyan/20 transition-all text-sm border border-daleel-cyan/30 hover:border-daleel-cyan/60"
+                title={t('admin.title')}
               >
                 <Shield size={14} />
-                <span className="hidden md:inline font-medium">Admin</span>
+                <span className="hidden md:inline font-medium">{t('admin.title')}</span>
               </Link>
             )}
 
@@ -104,22 +104,23 @@ export const Navbar: React.FC<Props> = ({
             {user && (
               <Link
                 to="/settings"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm border border-white/20"
-                title="Settings"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-daleel-cyan/20 transition-all text-sm border border-daleel-cyan/30 hover:border-daleel-cyan/60"
+                title={t('settings.title')}
               >
                 <Settings size={14} />
-                <span className="hidden md:inline font-medium">Settings</span>
+                <span className="hidden md:inline font-medium">{t('settings.title')}</span>
               </Link>
             )}
           </div>
 
           {/* Language Toggle */}
           <button
-            onClick={toggleLang}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/10 hover:bg-white/20 transition-all text-sm border border-white/20"
+            onClick={toggleLanguage}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-daleel-neon/10 hover:bg-daleel-neon/20 transition-all text-sm border border-daleel-neon/30 hover:border-daleel-neon glow-hover"
+            title={t('common.language')}
           >
             <Globe size={14} />
-            <span className="font-bold">{lang === 'ar' ? 'EN' : 'ع'}</span>
+            <span className="font-bold">{language === 'ar' ? 'EN' : 'ع'}</span>
           </button>
 
           {/* Auth Button */}
@@ -127,17 +128,17 @@ export const Navbar: React.FC<Props> = ({
             <button
               onClick={handleSignOut}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-red-500/80 hover:bg-red-500 transition-all text-sm font-medium"
-              title="Sign Out"
+              title={t('common.logout')}
             >
               <LogOut size={14} />
-              <span className="hidden md:inline">Logout</span>
+              <span className="hidden md:inline">{t('common.logout')}</span>
             </button>
           ) : (
             <Link
               to="/login"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/20 hover:bg-white/30 transition-all text-sm font-medium"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-daleel-neon/20 hover:bg-daleel-neon/30 transition-all text-sm font-medium glow-neon"
             >
-              Sign In
+              {t('common.login')}
             </Link>
           )}
 

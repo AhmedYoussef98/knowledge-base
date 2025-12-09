@@ -4,70 +4,14 @@ import { Navbar } from '../components/Navbar';
 import { KnowledgeCard } from '../components/KnowledgeCard';
 import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
 import { AIAssistant } from '../components/AIAssistant';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
 import { getAllContent, getCategories, getAnalytics, getRecentSearches, logSearchEvent, logQuestionClickEvent } from '../services/api';
 import { getTenantBySlug, getUserTenantRole, UserRole } from '../services/tenantApi';
 import { Tenant } from '../contexts/TenantContext';
 import { useAuth } from '../contexts/AuthContext';
 import { KnowledgeItem, CategoryData, AnalyticsData, SearchLog, SortOption } from '../types';
-import { Search, Filter, SortAsc, History, BarChart2, Loader2, Sparkles, AlertCircle } from 'lucide-react';
-
-// Translation Dictionary
-const TRANSLATIONS = {
-    ar: {
-        navSubtitle: 'القاعدة المعرفية لخدمة العملاء',
-        online: 'متصل',
-        searchPlaceholder: 'ابحث عن سؤال...',
-        allCategories: 'جميع الفئات',
-        sortRecent: 'الأكثر استخداماً',
-        sortCategory: 'حسب الفئة',
-        sortAlpha: 'أبجدي',
-        add: 'إضافة',
-        recent: 'سجل البحث',
-        analytics: 'الإحصائيات',
-        loading: 'جاري تحميل قاعدة المعرفة...',
-        noResults: 'لم يتم العثور على نتائج',
-        noResultsSub: 'جرب البحث بكلمات مختلفة',
-        showAll: 'عرض جميع النتائج',
-        analyticsTitle: 'إحصائيات القاعدة المعرفية',
-        topKeywords: 'الكلمات الأكثر بحثاً',
-        topQuestions: 'الأسئلة الأكثر شيوعاً',
-        views: 'مشاهدة',
-        copyAnswer: 'نسخ الإجابة',
-        copied: 'تم النسخ',
-        footerRights: 'جميع الحقوق محفوظة.',
-        recentSearchTitle: 'بحث مؤخراً',
-        noRecentSearch: 'لا يوجد سجل بحث',
-        notFound: 'لم يتم العثور على قاعدة المعرفة',
-        notFoundSub: 'تأكد من الرابط أو ارجع للصفحة الرئيسية',
-    },
-    en: {
-        navSubtitle: 'Customer Service Knowledge Base',
-        online: 'Online',
-        searchPlaceholder: 'Search for a question...',
-        allCategories: 'All Categories',
-        sortRecent: 'Most Viewed',
-        sortCategory: 'By Category',
-        sortAlpha: 'Alphabetical',
-        add: 'Add',
-        recent: 'History',
-        analytics: 'Stats',
-        loading: 'Loading Knowledge Base...',
-        noResults: 'No results found',
-        noResultsSub: 'Try different keywords',
-        showAll: 'Show all results',
-        analyticsTitle: 'Knowledge Base Analytics',
-        topKeywords: 'Top Keywords',
-        topQuestions: 'Top Questions',
-        views: 'views',
-        copyAnswer: 'Copy Answer',
-        copied: 'Copied',
-        footerRights: 'All rights reserved.',
-        recentSearchTitle: 'Recent Searches',
-        noRecentSearch: 'No search history',
-        notFound: 'Knowledge Base Not Found',
-        notFoundSub: 'Check the URL or go back to home',
-    }
-};
+import { Search, Filter, SortAsc, History, BarChart2, Loader2, CircuitBoard, AlertCircle } from 'lucide-react';
 
 export default function Home() {
     // Get tenant slug from URL
@@ -75,6 +19,10 @@ export default function Home() {
 
     // Auth context
     const { user } = useAuth();
+
+    // Language context
+    const { language, isRTL } = useLanguage();
+    const { t } = useTranslation();
 
     // Tenant state
     const [tenant, setTenant] = useState<Tenant | null>(null);
@@ -86,21 +34,6 @@ export default function Home() {
 
     // Check if current user can edit (owner or admin)
     const canEdit = userRole === 'owner' || userRole === 'admin';
-
-    // Language State
-    const [lang, setLang] = useState<'ar' | 'en'>('en');
-    const t = (key: string) => TRANSLATIONS[lang][key as keyof typeof TRANSLATIONS['ar']] || key;
-    const toggleLang = () => {
-        const newLang = lang === 'ar' ? 'en' : 'ar';
-        setLang(newLang);
-        document.documentElement.dir = newLang === 'ar' ? 'rtl' : 'ltr';
-        document.documentElement.lang = newLang;
-    };
-
-    useEffect(() => {
-        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-        document.documentElement.lang = lang;
-    }, [lang]);
 
     // Data State
     const [data, setData] = useState<KnowledgeItem[]>([]);
@@ -217,24 +150,28 @@ export default function Home() {
 
     const uniqueCategories = useMemo(() => categories.map(c => c.mainCategory), [categories]);
 
-    // Get primary color from tenant or use default
-    const primaryColor = tenant?.primary_color || '#F97316';
+    // Get primary color from tenant or use default Daleel neon
+    const primaryColor = tenant?.primary_color || '#A3FF47';
 
     // Tenant not found state
     if (tenantNotFound) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="text-center">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4">
+                <div className={`text-center max-w-md`}>
+                    <div className="w-16 h-16 bg-red-500/20 border-2 border-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
                         <AlertCircle className="w-8 h-8 text-red-500" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">{t('notFound')}</h1>
-                    <p className="text-gray-600 mb-6">{t('notFoundSub')}</p>
+                    <h1 className="text-2xl font-bold text-daleel-pure-light mb-2" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                        {language === 'ar' ? 'لم يتم العثور على قاعدة المعرفة' : 'Knowledge Base Not Found'}
+                    </h1>
+                    <p className="text-daleel-pure-light/70 mb-6">
+                        {language === 'ar' ? 'تأكد من الرابط أو ارجع للصفحة الرئيسية' : 'Check the URL or go back to home'}
+                    </p>
                     <Link
                         to="/"
-                        className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                        className="inline-block px-6 py-3 bg-daleel-neon text-daleel-deep-space rounded-xl hover:bg-daleel-green transition-all font-medium glow-neon"
                     >
-                        Go Home
+                        {language === 'ar' ? 'العودة للرئيسية' : 'Go Home'}
                     </Link>
                 </div>
             </div>
@@ -244,18 +181,15 @@ export default function Home() {
     // Loading state
     if (tenantLoading) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center">
+                <Loader2 className="w-8 h-8 text-daleel-neon animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className={`min-h-screen ${lang === 'ar' ? 'font-arabic' : 'font-sans'} bg-squad-bg flex flex-col`}>
+        <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex flex-col">
             <Navbar
-                lang={lang}
-                toggleLang={toggleLang}
-                t={t}
                 tenantName={tenant?.name}
                 primaryColor={primaryColor}
                 tenantSlug={slug}
@@ -265,19 +199,19 @@ export default function Home() {
             <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">
 
                 {/* Search & Filter Section */}
-                <div className="bg-white rounded-2xl shadow-sm border border-squad-softPurple/30 p-6 mb-8 sticky top-24 z-30 transition-shadow hover:shadow-md">
+                <div className="bg-daleel-tech-slate rounded-2xl shadow-lg border border-daleel-cyan/20 p-6 mb-8 sticky top-24 z-30 glow-cyan">
                     <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
 
                         {/* Category Filter */}
                         <div className="md:col-span-3">
                             <div className="relative">
-                                <Filter className="absolute top-1/2 rtl:right-3 ltr:left-3 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <Filter className={`absolute top-1/2 ${isRTL ? 'right-3' : 'left-3'} -translate-y-1/2 text-daleel-cyan w-4 h-4`} />
                                 <select
-                                    className="w-full bg-squad-bg/50 border border-gray-200 text-squad-primary text-sm rounded-lg focus:ring-squad-orange focus:border-squad-orange block p-3 rtl:pr-10 ltr:pl-10 appearance-none transition-colors font-medium"
+                                    className={`w-full bg-daleel-deep-space border border-daleel-cyan/30 text-daleel-pure-light text-sm rounded-lg focus:ring-2 focus:ring-daleel-neon focus:border-daleel-neon block p-3 ${isRTL ? 'pr-10' : 'pl-10'} appearance-none transition-all font-medium`}
                                     value={selectedCategory}
                                     onChange={(e) => setSelectedCategory(e.target.value)}
                                 >
-                                    <option value="">{t('allCategories')}</option>
+                                    <option value="">{t('kb.allCategories')}</option>
                                     {uniqueCategories.map(c => (
                                         <option key={c} value={c}>{c}</option>
                                     ))}
@@ -288,15 +222,15 @@ export default function Home() {
                         {/* Sort Option */}
                         <div className="md:col-span-2">
                             <div className="relative">
-                                <SortAsc className="absolute top-1/2 rtl:right-3 ltr:left-3 -translate-y-1/2 text-gray-400 w-4 h-4" />
+                                <SortAsc className={`absolute top-1/2 ${isRTL ? 'right-3' : 'left-3'} -translate-y-1/2 text-daleel-cyan w-4 h-4`} />
                                 <select
-                                    className="w-full bg-squad-bg/50 border border-gray-200 text-squad-primary text-sm rounded-lg focus:ring-squad-orange focus:border-squad-orange block p-3 rtl:pr-10 ltr:pl-10 appearance-none transition-colors font-medium"
+                                    className={`w-full bg-daleel-deep-space border border-daleel-cyan/30 text-daleel-pure-light text-sm rounded-lg focus:ring-2 focus:ring-daleel-neon focus:border-daleel-neon block p-3 ${isRTL ? 'pr-10' : 'pl-10'} appearance-none transition-all font-medium`}
                                     value={sortOption}
                                     onChange={(e) => setSortOption(e.target.value as SortOption)}
                                 >
-                                    <option value="mostClicked">{t('sortRecent')}</option>
-                                    <option value="category">{t('sortCategory')}</option>
-                                    <option value="alphabetical">{t('sortAlpha')}</option>
+                                    <option value="mostClicked">{language === 'ar' ? 'الأكثر استخداماً' : 'Most Viewed'}</option>
+                                    <option value="category">{language === 'ar' ? 'حسب الفئة' : 'By Category'}</option>
+                                    <option value="alphabetical">{language === 'ar' ? 'أبجدي' : 'Alphabetical'}</option>
                                 </select>
                             </div>
                         </div>
@@ -306,12 +240,13 @@ export default function Home() {
                             <div className="relative">
                                 <input
                                     type="text"
-                                    className="w-full bg-squad-bg/50 border border-gray-200 text-gray-900 text-sm rounded-lg focus:ring-squad-orange focus:border-squad-orange block p-3 rtl:pr-10 ltr:pl-10 shadow-sm transition-all focus:shadow-md"
-                                    placeholder={t('searchPlaceholder')}
+                                    className={`w-full bg-daleel-deep-space border border-daleel-cyan/30 text-daleel-pure-light text-sm rounded-lg focus:ring-2 focus:ring-daleel-neon focus:border-daleel-neon block p-3 ${isRTL ? 'pr-10' : 'pl-10'} shadow-sm transition-all placeholder:text-daleel-pure-light/40`}
+                                    placeholder={t('kb.searchPlaceholder')}
                                     value={searchQuery}
                                     onChange={handleSearch}
+                                    dir={isRTL ? 'rtl' : 'ltr'}
                                 />
-                                <Search className="absolute top-1/2 rtl:right-3 ltr:left-3 -translate-y-1/2 w-5 h-5" style={{ color: primaryColor }} />
+                                <Search className={`absolute top-1/2 ${isRTL ? 'right-3' : 'left-3'} -translate-y-1/2 w-5 h-5`} style={{ color: primaryColor }} />
                             </div>
                         </div>
 
@@ -319,33 +254,37 @@ export default function Home() {
                         <div className="md:col-span-2 flex gap-2">
                             <button
                                 onClick={() => setShowRecentSearches(!showRecentSearches)}
-                                className="flex items-center justify-center p-3 text-gray-500 bg-squad-bg/50 border border-gray-200 hover:bg-white hover:border-gray-300 rounded-lg transition-all relative w-12"
-                                title={t('recent')}
+                                className="flex items-center justify-center p-3 text-daleel-pure-light/70 bg-daleel-deep-space border border-daleel-cyan/30 hover:bg-daleel-tech-slate hover:border-daleel-cyan transition-all rounded-lg relative w-12"
+                                title={language === 'ar' ? 'سجل البحث' : 'History'}
                             >
                                 <History size={20} />
                                 {showRecentSearches && (
-                                    <div className="absolute top-full mt-2 rtl:left-0 ltr:right-0 w-64 bg-white rounded-xl shadow-xl border border-gray-100 p-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2">
-                                        <div className="text-xs font-semibold text-gray-400 mb-2 px-2">{t('recentSearchTitle')}</div>
+                                    <div className={`absolute top-full mt-2 ${isRTL ? 'left-0' : 'right-0'} w-64 bg-daleel-tech-slate rounded-xl shadow-xl border border-daleel-cyan/30 p-2 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2`}>
+                                        <div className="text-xs font-semibold text-daleel-cyan mb-2 px-2">
+                                            {language === 'ar' ? 'بحث مؤخراً' : 'Recent Searches'}
+                                        </div>
                                         {recentSearches.length > 0 ? (
                                             recentSearches.map((s, idx) => (
                                                 <div
                                                     key={idx}
                                                     onClick={() => handleRecentSearchClick(s.query)}
-                                                    className="px-3 py-2 hover:bg-gray-50 rounded-lg cursor-pointer text-sm text-gray-700 truncate rtl:text-right ltr:text-left"
+                                                    className={`px-3 py-2 hover:bg-daleel-deep-space rounded-lg cursor-pointer text-sm text-daleel-pure-light truncate ${isRTL ? 'text-right' : 'text-left'}`}
                                                 >
                                                     {s.query}
                                                 </div>
                                             ))
                                         ) : (
-                                            <div className="text-center py-4 text-xs text-gray-400">{t('noRecentSearch')}</div>
+                                            <div className="text-center py-4 text-xs text-daleel-pure-light/50">
+                                                {language === 'ar' ? 'لا يوجد سجل بحث' : 'No search history'}
+                                            </div>
                                         )}
                                     </div>
                                 )}
                             </button>
                             <button
                                 onClick={() => setShowAnalytics(true)}
-                                className="flex items-center justify-center p-3 text-gray-500 bg-squad-bg/50 border border-gray-200 hover:bg-white hover:border-gray-300 rounded-lg transition-all w-12"
-                                title={t('analytics')}
+                                className="flex items-center justify-center p-3 text-daleel-pure-light/70 bg-daleel-deep-space border border-daleel-cyan/30 hover:bg-daleel-tech-slate hover:border-daleel-cyan transition-all rounded-lg w-12"
+                                title={t('analytics.title')}
                             >
                                 <BarChart2 size={20} />
                             </button>
@@ -357,7 +296,9 @@ export default function Home() {
                 {isLoading ? (
                     <div className="flex flex-col items-center justify-center py-20">
                         <Loader2 className="w-10 h-10 animate-spin mb-4" style={{ color: primaryColor }} />
-                        <p className="text-squad-primary animate-pulse font-medium">{t('loading')}</p>
+                        <p className="text-daleel-pure-light animate-pulse font-medium">
+                            {language === 'ar' ? 'جاري تحميل قاعدة المعرفة...' : 'Loading Knowledge Base...'}
+                        </p>
                     </div>
                 ) : (
                     <div className="space-y-4">
@@ -369,23 +310,26 @@ export default function Home() {
                                     categoryIndex={uniqueCategories.indexOf(item.category)}
                                     onView={(id) => logQuestionClickEvent(id)}
                                     t={t}
-                                    lang={lang}
+                                    lang={language}
                                 />
                             ))
                         ) : (
-                            <div className="text-center py-16 bg-white rounded-2xl border border-squad-palePurple border-dashed">
-                                <div className="bg-squad-bg w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                                    <Sparkles className="text-squad-lavender" size={32} />
+                            <div className="text-center py-16 bg-daleel-tech-slate rounded-2xl border border-daleel-cyan/30 border-dashed">
+                                <div className="bg-daleel-neon/20 border-2 border-daleel-neon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 glow-neon">
+                                    <CircuitBoard className="text-daleel-neon" size={32} />
                                 </div>
-                                <h3 className="text-lg font-medium text-squad-primary">{t('noResults')}</h3>
-                                <p className="text-gray-500 mt-1">{t('noResultsSub')}</p>
+                                <h3 className="text-lg font-medium text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                                    {t('kb.noResults')}
+                                </h3>
+                                <p className="text-daleel-pure-light/60 mt-1">
+                                    {language === 'ar' ? 'جرب البحث بكلمات مختلفة' : 'Try different keywords'}
+                                </p>
                                 <div className="mt-4 flex gap-4 justify-center">
                                     <button
                                         onClick={() => { setSearchQuery(''); setSelectedCategory(''); }}
-                                        className="hover:underline text-sm font-medium"
-                                        style={{ color: primaryColor }}
+                                        className="hover:underline text-sm font-medium text-daleel-cyan hover:text-daleel-neon transition-colors"
                                     >
-                                        {t('showAll')}
+                                        {language === 'ar' ? 'عرض جميع النتائج' : 'Show all results'}
                                     </button>
                                 </div>
                             </div>
@@ -400,7 +344,6 @@ export default function Home() {
                     data={analyticsData}
                     isOpen={showAnalytics}
                     onClose={() => setShowAnalytics(false)}
-                    t={t}
                 />
             )}
 
@@ -414,9 +357,9 @@ export default function Home() {
             )}
 
             {/* Footer */}
-            <footer className="bg-white border-t border-gray-200 mt-auto">
-                <div className="container mx-auto px-4 py-6 text-center text-sm text-gray-500 flex flex-col items-center gap-4">
-                    <p>&copy; {new Date().getFullYear()} {tenant?.name || 'Knowledge Base'}. {t('footerRights')}</p>
+            <footer className="bg-daleel-tech-slate border-t border-daleel-cyan/20 mt-auto">
+                <div className="container mx-auto px-4 py-6 text-center text-sm text-daleel-pure-light/60 flex flex-col items-center gap-4">
+                    <p>&copy; {new Date().getFullYear()} {tenant?.name || t('brand.name')}. {language === 'ar' ? 'جميع الحقوق محفوظة.' : 'All rights reserved.'}</p>
                 </div>
             </footer>
         </div>

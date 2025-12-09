@@ -6,30 +6,18 @@ import { QuestionModal } from '../components/Admin/QuestionModal';
 import { getAllContent, getCategories } from '../services/api';
 import { getTenantBySlug, getUserTenantRole, UserRole } from '../services/tenantApi';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
 import { Tenant } from '../contexts/TenantContext';
 import { KnowledgeItem, CategoryData } from '../types';
-import { Plus, LayoutDashboard, Loader2, Settings, ExternalLink, AlertCircle } from 'lucide-react';
-
-// Simple translation mock for Navbar reuse
-const TRANSLATIONS = {
-    ar: {
-        navSubtitle: 'لوحة تحكم المشرف',
-        online: 'متصل',
-    },
-    en: {
-        navSubtitle: 'Admin Dashboard',
-        online: 'Online',
-    }
-};
+import { Plus, LayoutDashboard, Loader2, Settings, ExternalLink, AlertCircle, Shield, Crown } from 'lucide-react';
 
 export default function Admin() {
     const { slug } = useParams<{ slug: string }>();
     const { user, loading: authLoading } = useAuth();
+    const { language, isRTL } = useLanguage();
+    const { t } = useTranslation();
     const navigate = useNavigate();
-
-    const [lang, setLang] = useState<'ar' | 'en'>('en');
-    const t = (key: string) => TRANSLATIONS[lang][key as keyof typeof TRANSLATIONS['ar']] || key;
-    const toggleLang = () => setLang(l => l === 'ar' ? 'en' : 'ar');
 
     const [tenant, setTenant] = useState<Tenant | null>(null);
     const [tenantLoading, setTenantLoading] = useState(true);
@@ -124,37 +112,43 @@ export default function Admin() {
         fetchData();
     };
 
-    const primaryColor = tenant?.primary_color || '#3B82F6';
+    const primaryColor = tenant?.primary_color || '#A3FF47';
 
     if (tenantLoading || authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-daleel-deep-space circuit-pattern">
+                <Loader2 className="w-8 h-8 text-daleel-neon animate-spin" />
             </div>
         );
     }
 
     if (unauthorized) {
         return (
-            <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
-                <div className="text-center">
-                    <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                        <AlertCircle className="w-8 h-8 text-red-500" />
+            <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
+                <div className={`text-center ${isRTL ? 'text-right' : ''}`}>
+                    <div className="w-16 h-16 bg-red-400/20 border-2 border-red-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                        <AlertCircle className="w-8 h-8 text-red-400" />
                     </div>
-                    <h1 className="text-2xl font-bold text-gray-900 mb-2">Access Denied</h1>
-                    <p className="text-gray-600 mb-6">You don't have permission to access this admin panel. Only owners and admins can manage content.</p>
-                    <div className="flex gap-4 justify-center">
+                    <h1 className="text-2xl font-bold text-daleel-pure-light mb-2" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                        {language === 'ar' ? 'الوصول مرفوض' : 'Access Denied'}
+                    </h1>
+                    <p className="text-daleel-pure-light/70 mb-6 max-w-md">
+                        {language === 'ar'
+                            ? 'ليس لديك صلاحية للوصول لهذه اللوحة. المالكون والمدراء فقط يمكنهم إدارة المحتوى.'
+                            : "You don't have permission to access this admin panel. Only owners and admins can manage content."}
+                    </p>
+                    <div className={`flex gap-4 justify-center ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <Link
                             to="/login"
-                            className="px-6 py-3 bg-blue-600 text-white rounded-xl hover:bg-blue-700 transition-colors font-medium"
+                            className="px-6 py-3 bg-daleel-neon text-daleel-deep-space rounded-xl hover:bg-daleel-green transition-colors font-semibold glow-neon"
                         >
-                            Sign In
+                            {t('common.login')}
                         </Link>
                         <Link
                             to={slug ? `/kb/${slug}` : '/'}
-                            className="px-6 py-3 bg-white border border-gray-200 text-gray-700 rounded-xl hover:bg-gray-50 transition-colors font-medium"
+                            className="px-6 py-3 bg-daleel-tech-slate border border-daleel-cyan/30 text-daleel-pure-light rounded-xl hover:border-daleel-cyan transition-colors font-medium"
                         >
-                            View Knowledge Base
+                            {language === 'ar' ? 'عرض القاعدة المعرفية' : 'View Knowledge Base'}
                         </Link>
                     </div>
                 </div>
@@ -163,11 +157,8 @@ export default function Admin() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50 font-sans">
+        <div className="min-h-screen bg-daleel-deep-space circuit-pattern font-sans" dir={isRTL ? 'rtl' : 'ltr'}>
             <Navbar
-                lang={lang}
-                toggleLang={toggleLang}
-                t={t}
                 tenantName={tenant?.name}
                 primaryColor={primaryColor}
                 tenantSlug={slug}
@@ -177,42 +168,52 @@ export default function Admin() {
             <div className="container mx-auto px-4 py-8 max-w-6xl">
 
                 {/* Header */}
-                <div className="flex justify-between items-center mb-8">
-                    <div>
-                        <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-                            <LayoutDashboard className="w-8 h-8" style={{ color: primaryColor }} />
-                            Admin Dashboard
+                <div className={`flex justify-between items-center mb-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <div className={isRTL ? 'text-right' : ''}>
+                        <h1 className={`text-3xl font-bold text-daleel-pure-light flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`} style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                            <LayoutDashboard className="w-8 h-8 text-daleel-neon" />
+                            {t('admin.title')}
                         </h1>
-                        <p className="text-gray-500 mt-2">
-                            Manage questions, answers, and categories.
-                            {userRole === 'admin' && <span className="text-blue-600 ml-2">(Admin)</span>}
-                            {userRole === 'owner' && <span className="text-green-600 ml-2">(Owner)</span>}
+                        <p className={`text-daleel-pure-light/70 mt-2 flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                            {language === 'ar' ? 'إدارة الأسئلة والأجوبة والتصنيفات.' : 'Manage questions, answers, and categories.'}
+                            {userRole === 'admin' && (
+                                <span className={`text-daleel-cyan font-medium flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                    <Shield className="w-4 h-4" />
+                                    ({language === 'ar' ? 'مدير' : 'Admin'})
+                                </span>
+                            )}
+                            {userRole === 'owner' && (
+                                <span className={`text-daleel-neon font-medium flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                    <Crown className="w-4 h-4" />
+                                    ({language === 'ar' ? 'مالك' : 'Owner'})
+                                </span>
+                            )}
                         </p>
                     </div>
-                    <div className="flex gap-3">
+                    <div className={`flex gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         {userRole === 'owner' && (
                             <Link
                                 to="/settings"
-                                className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
+                                className={`px-4 py-2 bg-daleel-tech-slate border border-daleel-cyan/30 text-daleel-pure-light rounded-lg hover:border-daleel-cyan transition-colors font-medium flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                             >
                                 <Settings className="w-4 h-4" />
-                                Settings
+                                {t('settings.title')}
                             </Link>
                         )}
                         <Link
                             to={`/kb/${slug}`}
-                            className="px-4 py-2 bg-white border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors font-medium flex items-center gap-2"
+                            className={`px-4 py-2 bg-daleel-tech-slate border border-daleel-cyan/30 text-daleel-pure-light rounded-lg hover:border-daleel-cyan transition-colors font-medium flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
                         >
                             <ExternalLink className="w-4 h-4" />
-                            View Site
+                            {language === 'ar' ? 'عرض الموقع' : 'View Site'}
                         </Link>
                         <button
                             onClick={handleAdd}
-                            className="px-4 py-2 text-white rounded-lg hover:opacity-90 transition-colors font-bold flex items-center gap-2 shadow-lg"
+                            className={`px-4 py-2 text-daleel-deep-space rounded-lg hover:opacity-90 transition-all font-bold flex items-center gap-2 shadow-lg glow-neon ${isRTL ? 'flex-row-reverse' : ''}`}
                             style={{ backgroundColor: primaryColor }}
                         >
                             <Plus className="w-5 h-5" />
-                            Add Question
+                            {t('admin.addQuestion')}
                         </button>
                     </div>
                 </div>
@@ -220,7 +221,7 @@ export default function Admin() {
                 {/* Content */}
                 {isLoading ? (
                     <div className="flex justify-center py-20">
-                        <Loader2 className="w-10 h-10 animate-spin" style={{ color: primaryColor }} />
+                        <Loader2 className="w-10 h-10 animate-spin text-daleel-neon" />
                     </div>
                 ) : (
                     <QuestionTable

@@ -1,16 +1,20 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
 import { createTenant, generateSlug, isSlugAvailable } from '../services/tenantApi';
 import {
     BookOpen, Key, Palette, ArrowRight, ArrowLeft, Check,
-    Loader2, AlertCircle, Sparkles, CheckCircle2, X, ExternalLink
+    Loader2, AlertCircle, Sparkles, CheckCircle2, X, ExternalLink, Globe, CircuitBoard
 } from 'lucide-react';
 
 type Step = 1 | 2 | 3;
 
 export default function Onboarding() {
     const { user, loading: authLoading } = useAuth();
+    const { language, isRTL, toggleLanguage } = useLanguage();
+    const { t } = useTranslation();
     const navigate = useNavigate();
 
     const [step, setStep] = useState<Step>(1);
@@ -22,7 +26,7 @@ export default function Onboarding() {
     const [slug, setSlug] = useState('');
     const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
     const [apiKey, setApiKey] = useState('');
-    const [primaryColor, setPrimaryColor] = useState('#F97316');
+    const [primaryColor, setPrimaryColor] = useState('#A3FF47');
 
     // Redirect if not logged in
     useEffect(() => {
@@ -30,8 +34,6 @@ export default function Onboarding() {
             navigate('/login');
         }
     }, [user, authLoading, navigate]);
-
-    // Note: Removed the check validitating if user already has a tenant, as we support multiple now
 
     // Auto-generate slug from name
     useEffect(() => {
@@ -73,12 +75,12 @@ export default function Onboarding() {
 
     const handleComplete = async () => {
         if (!name || !slug) {
-            setError('Please provide a name for your knowledge base');
+            setError(language === 'ar' ? 'يرجى إدخال اسم لقاعدتك المعرفية' : 'Please provide a name for your knowledge base');
             return;
         }
 
         if (!slugAvailable) {
-            setError('This URL is already taken. Please choose a different one.');
+            setError(t('settings.slugTaken'));
             return;
         }
 
@@ -117,64 +119,78 @@ export default function Onboarding() {
     };
 
     const steps = [
-        { num: 1, title: 'Name', icon: BookOpen },
-        { num: 2, title: 'AI Key', icon: Key },
-        { num: 3, title: 'Style', icon: Palette },
+        { num: 1, title: t('onboarding.step1Title'), icon: BookOpen },
+        { num: 2, title: language === 'ar' ? 'مفتاح AI' : 'AI Key', icon: Key },
+        { num: 3, title: language === 'ar' ? 'المظهر' : 'Style', icon: Palette },
     ];
 
     const colors = [
-        '#F97316', // Orange
+        '#A3FF47', // Daleel Neon
+        '#00C2CB', // Circuit Cyan
+        '#4ADE80', // Core Green
+        '#14B8A6', // Teal
         '#3B82F6', // Blue
         '#8B5CF6', // Purple
-        '#10B981', // Green
-        '#EF4444', // Red
         '#EC4899', // Pink
-        '#6366F1', // Indigo
-        '#14B8A6', // Teal
+        '#EF4444', // Red
     ];
 
     if (authLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Loader2 className="w-8 h-8 text-blue-600 animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-daleel-deep-space circuit-pattern">
+                <Loader2 className="w-8 h-8 text-daleel-neon animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
+        <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4" dir={isRTL ? 'rtl' : 'ltr'}>
             <div className="w-full max-w-xl relative">
 
-                {/* Close Button */}
-                <Link
-                    to="/dashboard"
-                    className="absolute -top-12 right-0 p-2 bg-white/50 hover:bg-white rounded-full transition-colors"
-                    title="Cancel"
-                >
-                    <X className="w-6 h-6 text-gray-600" />
-                </Link>
+                {/* Top Bar */}
+                <div className={`absolute -top-12 w-full flex justify-between items-center ${isRTL ? 'flex-row-reverse' : ''}`}>
+                    <button
+                        onClick={toggleLanguage}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-daleel-tech-slate hover:bg-daleel-tech-slate/80 transition-all text-sm border border-daleel-cyan/30 hover:border-daleel-neon text-daleel-pure-light"
+                    >
+                        <Globe size={14} />
+                        <span className="font-bold">{language === 'ar' ? 'EN' : 'ع'}</span>
+                    </button>
+                    <Link
+                        to="/dashboard"
+                        className="p-2 bg-daleel-tech-slate/50 hover:bg-daleel-tech-slate rounded-full transition-colors border border-daleel-cyan/20 hover:border-daleel-cyan"
+                        title={t('common.cancel')}
+                    >
+                        <X className="w-6 h-6 text-daleel-pure-light/70" />
+                    </Link>
+                </div>
 
                 {/* Header */}
-                <div className="text-center mb-8">
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
-                        <Sparkles className="w-8 h-8 text-white" />
+                <div className={`text-center mb-8 ${isRTL ? 'text-right' : ''}`}>
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-gradient rounded-2xl shadow-lg mb-4 glow-neon">
+                        <CircuitBoard className="w-8 h-8 text-daleel-deep-space" />
                     </div>
-                    <h1 className="text-3xl font-bold text-gray-900">Create New Knowledge Base</h1>
-                    <p className="text-gray-600 mt-2">Just a few quick steps to get started</p>
+                    <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                        {language === 'ar' ? 'إنشاء قاعدة معرفية جديدة' : 'Create New Knowledge Base'}
+                    </h1>
+                    <p className="text-daleel-pure-light/70 mt-2">
+                        {language === 'ar' ? 'خطوات سريعة للبدء' : 'Just a few quick steps to get started'}
+                    </p>
                 </div>
 
                 {/* Progress Steps */}
                 <div className="flex justify-center mb-8">
-                    <div className="flex items-center gap-2">
+                    <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         {steps.map((s, idx) => (
                             <React.Fragment key={s.num}>
                                 <div
-                                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${step === s.num
-                                        ? 'bg-blue-600 text-white'
-                                        : step > s.num
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-gray-100 text-gray-400'
-                                        }`}
+                                    className={`flex items-center gap-2 px-4 py-2 rounded-full transition-all ${
+                                        step === s.num
+                                            ? 'bg-daleel-neon text-daleel-deep-space'
+                                            : step > s.num
+                                            ? 'bg-daleel-green/20 text-daleel-green border border-daleel-green/30'
+                                            : 'bg-daleel-tech-slate text-daleel-pure-light/40 border border-daleel-cyan/20'
+                                    }`}
                                 >
                                     {step > s.num ? (
                                         <CheckCircle2 className="w-5 h-5" />
@@ -184,7 +200,7 @@ export default function Onboarding() {
                                     <span className="font-medium text-sm hidden sm:inline">{s.title}</span>
                                 </div>
                                 {idx < steps.length - 1 && (
-                                    <div className={`w-8 h-0.5 ${step > s.num ? 'bg-green-400' : 'bg-gray-200'}`} />
+                                    <div className={`w-8 h-0.5 ${step > s.num ? 'bg-daleel-green' : 'bg-daleel-cyan/20'}`} />
                                 )}
                             </React.Fragment>
                         ))}
@@ -192,45 +208,56 @@ export default function Onboarding() {
                 </div>
 
                 {/* Form Card */}
-                <div className="bg-white rounded-2xl shadow-xl p-8">
+                <div className="bg-daleel-tech-slate rounded-2xl shadow-2xl border border-daleel-cyan/30 p-8 glow-cyan">
 
                     {/* Step 1: Name & URL */}
                     {step === 1 && (
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    Knowledge Base Name
+                                <label className={`block text-sm font-medium text-daleel-pure-light/80 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                                    {t('onboarding.kbName')}
                                 </label>
                                 <input
                                     type="text"
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all text-lg"
-                                    placeholder="My Company Knowledge Base"
+                                    className={`w-full px-4 py-3 bg-daleel-deep-space border border-daleel-cyan/30 text-daleel-pure-light rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-daleel-neon transition-all text-lg ${isRTL ? 'text-right' : ''}`}
+                                    placeholder={language === 'ar' ? 'القاعدة المعرفية لشركتي' : 'My Company Knowledge Base'}
                                     autoFocus
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    URL Slug
+                                <label className={`block text-sm font-medium text-daleel-pure-light/80 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                                    {t('onboarding.kbSlug')}
                                 </label>
-                                <div className="flex items-center gap-2">
-                                    <span className="text-gray-400 text-sm">yoursite.com/kb/</span>
+                                <div className={`flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                    <span className="text-daleel-cyan text-sm">yoursite.com/kb/</span>
                                     <input
                                         type="text"
                                         value={slug}
                                         onChange={(e) => handleSlugChange(e.target.value)}
-                                        className={`flex-1 px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all ${slugAvailable === true ? 'border-green-300 bg-green-50' :
-                                            slugAvailable === false ? 'border-red-300 bg-red-50' :
-                                                'border-gray-200'
-                                            }`}
+                                        className={`flex-1 px-4 py-3 bg-daleel-deep-space border rounded-xl focus:ring-2 focus:ring-daleel-neon transition-all ${
+                                            slugAvailable === true ? 'border-daleel-green/50 bg-daleel-green/5' :
+                                            slugAvailable === false ? 'border-red-400/50 bg-red-400/5' :
+                                            'border-daleel-cyan/30'
+                                        } text-daleel-pure-light ${isRTL ? 'text-right' : ''}`}
                                         placeholder="my-company"
                                     />
                                 </div>
                                 {slugAvailable !== null && (
-                                    <p className={`text-sm mt-2 ${slugAvailable ? 'text-green-600' : 'text-red-600'}`}>
-                                        {slugAvailable ? '✓ This URL is available' : '✗ This URL is already taken'}
+                                    <p className={`text-sm mt-2 flex items-center gap-2 ${slugAvailable ? 'text-daleel-green' : 'text-red-400'} ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                        {slugAvailable ? (
+                                            <>
+                                                <CheckCircle2 className="w-4 h-4" />
+                                                {language === 'ar' ? 'هذا العنوان متاح' : 'This URL is available'}
+                                            </>
+                                        ) : (
+                                            <>
+                                                <AlertCircle className="w-4 h-4" />
+                                                {language === 'ar' ? 'هذا العنوان مستخدم بالفعل' : 'This URL is already taken'}
+                                            </>
+                                        )}
                                     </p>
                                 )}
                             </div>
@@ -240,28 +267,34 @@ export default function Onboarding() {
                     {/* Step 2: API Key */}
                     {step === 2 && (
                         <div className="space-y-6">
-                            <div className="p-4 bg-blue-50 border border-blue-200 rounded-xl">
-                                <h3 className="font-medium text-blue-900 mb-1">Gemini AI API Key</h3>
-                                <p className="text-sm text-blue-700">
-                                    Add your Gemini API key to enable AI-powered features like smart search and auto-generated answers.
+                            <div className="p-4 bg-daleel-cyan/10 border border-daleel-cyan/30 rounded-xl">
+                                <h3 className={`font-medium text-daleel-cyan mb-1 ${isRTL ? 'text-right' : ''}`}>
+                                    {t('onboarding.geminiApiKey')}
+                                </h3>
+                                <p className={`text-sm text-daleel-pure-light/70 ${isRTL ? 'text-right' : ''}`}>
+                                    {language === 'ar'
+                                        ? 'أضف مفتاح Gemini API لتفعيل المميزات الذكية مثل البحث الذكي والإجابات التلقائية.'
+                                        : 'Add your Gemini API key to enable AI-powered features like smart search and auto-generated answers.'}
                                 </p>
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
-                                    API Key <span className="text-gray-400">(optional)</span>
+                                <label className={`block text-sm font-medium text-daleel-pure-light/80 mb-2 ${isRTL ? 'text-right' : ''}`}>
+                                    {t('onboarding.geminiApiKey')} <span className="text-daleel-pure-light/40">({language === 'ar' ? 'اختياري' : 'optional'})</span>
                                 </label>
                                 <input
                                     type="password"
                                     value={apiKey}
                                     onChange={(e) => setApiKey(e.target.value)}
-                                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
+                                    className={`w-full px-4 py-3 bg-daleel-deep-space border border-daleel-cyan/30 text-daleel-pure-light rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-daleel-neon transition-all font-mono ${isRTL ? 'text-right' : ''}`}
                                     placeholder="AIzaSy..."
                                 />
-                                <div className="flex items-center justify-between text-xs mt-2">
-                                    <p className="text-gray-500">Required for AI responses</p>
-                                    <Link to="/gemini-guide" target="_blank" className="text-blue-600 hover:text-blue-700 font-medium hover:underline flex items-center gap-1">
-                                        How to get a free key?
+                                <div className={`flex items-center justify-between text-xs mt-2 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                    <p className="text-daleel-pure-light/50">
+                                        {language === 'ar' ? 'مطلوب للإجابات الذكية' : 'Required for AI responses'}
+                                    </p>
+                                    <Link to="/gemini-guide" target="_blank" className={`text-daleel-cyan hover:text-daleel-neon font-medium hover:underline flex items-center gap-1 ${isRTL ? 'flex-row-reverse' : ''}`}>
+                                        {language === 'ar' ? 'كيف تحصل على مفتاح مجاني؟' : 'How to get a free key?'}
                                         <ExternalLink className="w-3 h-3" />
                                     </Link>
                                 </div>
@@ -273,18 +306,19 @@ export default function Onboarding() {
                     {step === 3 && (
                         <div className="space-y-6">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-3">
-                                    Primary Color
+                                <label className={`block text-sm font-medium text-daleel-pure-light/80 mb-3 ${isRTL ? 'text-right' : ''}`}>
+                                    {t('onboarding.primaryColor')}
                                 </label>
-                                <div className="flex flex-wrap gap-3">
+                                <div className={`flex flex-wrap gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                     {colors.map(color => (
                                         <button
                                             key={color}
                                             onClick={() => setPrimaryColor(color)}
-                                            className={`w-10 h-10 rounded-full transition-all ${primaryColor === color
-                                                ? 'ring-4 ring-offset-2 ring-blue-400 scale-110'
-                                                : 'hover:scale-105'
-                                                }`}
+                                            className={`w-10 h-10 rounded-full transition-all ${
+                                                primaryColor === color
+                                                    ? 'ring-4 ring-offset-2 ring-offset-daleel-tech-slate ring-daleel-neon scale-110'
+                                                    : 'hover:scale-105'
+                                            }`}
                                             style={{ backgroundColor: color }}
                                         />
                                     ))}
@@ -292,18 +326,20 @@ export default function Onboarding() {
                             </div>
 
                             {/* Preview */}
-                            <div className="mt-6 p-6 bg-gray-50 rounded-xl">
-                                <p className="text-sm text-gray-500 mb-3">Preview</p>
-                                <div className="flex items-center gap-3">
+                            <div className="mt-6 p-6 bg-daleel-deep-space/50 border border-daleel-cyan/20 rounded-xl">
+                                <p className={`text-sm text-daleel-pure-light/50 mb-3 ${isRTL ? 'text-right' : ''}`}>
+                                    {language === 'ar' ? 'معاينة' : 'Preview'}
+                                </p>
+                                <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                                     <div
-                                        className="w-12 h-12 rounded-xl flex items-center justify-center text-white font-bold text-lg"
-                                        style={{ backgroundColor: primaryColor }}
+                                        className="w-12 h-12 rounded-xl flex items-center justify-center text-daleel-deep-space font-bold text-lg border-2 glow-neon"
+                                        style={{ backgroundColor: primaryColor, borderColor: primaryColor }}
                                     >
                                         {name ? name.charAt(0).toUpperCase() : 'K'}
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-gray-900">{name || 'Knowledge Base'}</h3>
-                                        <p className="text-sm text-gray-500">yoursite.com/kb/{slug || 'your-kb'}</p>
+                                    <div className={isRTL ? 'text-right' : ''}>
+                                        <h3 className="font-bold text-daleel-pure-light">{name || (language === 'ar' ? 'القاعدة المعرفية' : 'Knowledge Base')}</h3>
+                                        <p className="text-sm text-daleel-cyan">yoursite.com/kb/{slug || 'your-kb'}</p>
                                     </div>
                                 </div>
                             </div>
@@ -312,21 +348,21 @@ export default function Onboarding() {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm mt-6">
+                        <div className={`flex items-center gap-2 p-3 bg-red-400/20 border border-red-400/30 rounded-xl text-red-400 text-sm mt-6 ${isRTL ? 'flex-row-reverse' : ''}`}>
                             <AlertCircle className="w-5 h-5 flex-shrink-0" />
                             <span>{error}</span>
                         </div>
                     )}
 
                     {/* Navigation Buttons */}
-                    <div className="flex justify-between mt-8">
+                    <div className={`flex justify-between mt-8 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         {step > 1 ? (
                             <button
                                 onClick={handleBack}
-                                className="flex items-center gap-2 px-4 py-2 text-gray-600 hover:text-gray-900 transition-colors"
+                                className={`flex items-center gap-2 px-4 py-2 text-daleel-pure-light/70 hover:text-daleel-neon transition-colors ${isRTL ? 'flex-row-reverse' : ''}`}
                             >
-                                <ArrowLeft className="w-5 h-5" />
-                                Back
+                                {isRTL ? <ArrowRight className="w-5 h-5" /> : <ArrowLeft className="w-5 h-5" />}
+                                {t('common.back')}
                             </button>
                         ) : (
                             <div />
@@ -336,23 +372,23 @@ export default function Onboarding() {
                             <button
                                 onClick={handleNext}
                                 disabled={!canProceed()}
-                                className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`flex items-center gap-2 px-6 py-3 bg-daleel-neon text-daleel-deep-space font-bold rounded-xl hover:bg-daleel-green transition-all disabled:opacity-50 disabled:cursor-not-allowed glow-neon ${isRTL ? 'flex-row-reverse' : ''}`}
                             >
-                                Next
-                                <ArrowRight className="w-5 h-5" />
+                                {t('common.next')}
+                                {isRTL ? <ArrowLeft className="w-5 h-5" /> : <ArrowRight className="w-5 h-5" />}
                             </button>
                         ) : (
                             <button
                                 onClick={handleComplete}
                                 disabled={loading || !canProceed()}
-                                className="flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                                className={`flex items-center gap-2 px-6 py-3 bg-daleel-gradient text-daleel-deep-space font-bold rounded-xl hover:shadow-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed glow-neon ${isRTL ? 'flex-row-reverse' : ''}`}
                             >
                                 {loading ? (
                                     <Loader2 className="w-5 h-5 animate-spin" />
                                 ) : (
                                     <>
                                         <Check className="w-5 h-5" />
-                                        Create Knowledge Base
+                                        {language === 'ar' ? 'إنشاء القاعدة المعرفية' : 'Create Knowledge Base'}
                                     </>
                                 )}
                             </button>

@@ -35,14 +35,14 @@ export const convertGoogleDriveUrl = (url: string): string => {
 };
 
 export const getCategoryColor = (category: string, index: number): string => {
-  // Cycle through Squad secondary colors
-  const squadColors = [
-    'bg-squad-lavender text-white',
-    'bg-squad-orange text-white',
-    'bg-squad-softPurple text-squad-primary',
-    'bg-squad-palePurple text-squad-primary',
-    'bg-squad-primary text-white',
+  // Cycle through Daleel brand colors with glow effects
+  const daleelColors = [
+    'bg-daleel-cyan text-daleel-deep-space glow-cyan',
+    'bg-daleel-neon text-daleel-deep-space glow-neon',
+    'bg-daleel-green text-daleel-deep-space',
+    'bg-daleel-tech-slate text-daleel-pure-light border border-daleel-cyan',
+    'bg-daleel-gradient text-daleel-deep-space',
   ];
-  
-  return squadColors[index % squadColors.length];
+
+  return daleelColors[index % daleelColors.length];
 };

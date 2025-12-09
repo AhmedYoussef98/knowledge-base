@@ -2,37 +2,103 @@
 
 /* Custom theme configuration */
 @theme {
+  /* Typography - Tajawal for both Arabic and English, Space Grotesk for headings */
   --font-family-sans: "Tajawal", "Proxima Nova", sans-serif;
   --font-family-arabic: "Tajawal", sans-serif;
+  --font-family-heading: "Space Grotesk", "Tajawal", sans-serif;
 
-  --color-squad-primary: #281362;
-  --color-squad-orange: #FE6A11;
-  --color-squad-lavender: #A08FF6;
-  --color-squad-softPurple: #C0B8FA;
-  --color-squad-palePurple: #DFDBFF;
-  --color-squad-bg: #F4F3FF;
-  --color-squad-white: #FFFFFF;
+  /* Daleel Brand Colors - Circuit Glow Palette */
+  /* Primary Colors (The Light) */
+  --color-daleel-neon: #A3FF47;        /* Hero color - Primary CTAs, logo glow */
+  --color-daleel-cyan: #00C2CB;         /* Secondary accents, links */
+  --color-daleel-green: #4ADE80;        /* Success states, gradient bridge */
+
+  /* Neutral Colors (The Canvas) */
+  --color-daleel-deep-space: #0F172A;   /* Main background */
+  --color-daleel-tech-slate: #1E293B;   /* Secondary backgrounds (cards, sidebars) */
+  --color-daleel-pure-light: #F8FAFF;   /* Text on dark backgrounds */
+
+  /* Backwards compatibility - map old Squad colors to Daleel */
+  --color-squad-primary: #0F172A;
+  --color-squad-orange: #A3FF47;
+  --color-squad-lavender: #00C2CB;
+  --color-squad-softPurple: #4ADE80;
+  --color-squad-palePurple: #1E293B;
+  --color-squad-bg: #0F172A;
+  --color-squad-white: #F8FAFF;
+
+  /* Semantic colors */
+  --color-success: #4ADE80;
+  --color-error: #EF4444;
+  --color-warning: #F59E0B;
+  --color-info: #00C2CB;
 }
 
 body {
-  background-color: var(--color-squad-bg);
+  background-color: var(--color-daleel-deep-space);
+  color: var(--color-daleel-pure-light);
 }
 
-/* Custom Scrollbar */
+/* Custom Scrollbar - Daleel Style */
 ::-webkit-scrollbar {
   width: 8px;
   height: 8px;
 }
 
 ::-webkit-scrollbar-track {
-  background: var(--color-squad-bg);
+  background: var(--color-daleel-tech-slate);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--color-squad-softPurple);
+  background: var(--color-daleel-cyan);
   border-radius: 4px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: var(--color-squad-lavender);
+  background: var(--color-daleel-neon);
+}
+
+/* Daleel Glow Effects */
+.glow-neon {
+  box-shadow: 0 4px 15px -3px rgba(163, 255, 71, 0.4);
+}
+
+.glow-neon-lg {
+  box-shadow: 0 8px 30px -6px rgba(163, 255, 71, 0.5);
+}
+
+.glow-cyan {
+  box-shadow: 0 4px 15px -3px rgba(0, 194, 203, 0.4);
+}
+
+.glow-hover:hover {
+  box-shadow: 0 4px 20px -3px rgba(163, 255, 71, 0.6);
+  transition: box-shadow 0.3s ease;
+}
+
+/* Daleel Gradient - for buttons, text masking, backgrounds */
+.bg-daleel-gradient {
+  background: linear-gradient(135deg, #00C2CB 0%, #4ADE80 100%);
+}
+
+.text-daleel-gradient {
+  background: linear-gradient(135deg, #00C2CB 0%, #4ADE80 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Circuit Pattern Background (subtle) */
+.circuit-pattern {
+  background-image:
+    linear-gradient(90deg, rgba(163, 255, 71, 0.03) 1px, transparent 1px),
+    linear-gradient(rgba(163, 255, 71, 0.03) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Neon border on hover */
+.border-glow-hover:hover {
+  border-color: var(--color-daleel-neon);
+  box-shadow: 0 0 10px rgba(163, 255, 71, 0.3);
+  transition: all 0.3s ease;
 }

@@ -3,6 +3,8 @@ import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
 import {
     Sparkles,
     Search,
@@ -16,13 +18,16 @@ import {
     MessageSquare,
     BookOpen,
     Lightbulb,
-    LayoutDashboard
+    LayoutDashboard,
+    CircuitBoard
 } from 'lucide-react';
 
 gsap.registerPlugin(ScrollTrigger);
 
 export default function Landing() {
     const { user } = useAuth();
+    const { language, toggleLanguage, isRTL } = useLanguage();
+    const { t } = useTranslation();
     const heroRef = useRef<HTMLDivElement>(null);
     const featuresRef = useRef<HTMLDivElement>(null);
     const howItWorksRef = useRef<HTMLDivElement>(null);
@@ -108,7 +113,7 @@ export default function Landing() {
                     start: 'top 80%',
                 },
                 opacity: 0,
-                x: -30,
+                x: isRTL ? 30 : -30,
                 duration: 0.8,
                 stagger: 0.2,
                 ease: 'power3.out',
@@ -129,108 +134,174 @@ export default function Landing() {
         }, heroRef);
 
         return () => ctx.revert();
-    }, []);
+    }, [isRTL]);
 
     const features = [
         {
             icon: Search,
-            title: 'Smart Search',
-            description: 'AI-powered search helps your customers find answers instantly with natural language queries.',
-            color: 'from-blue-500 to-cyan-500',
+            title: {
+                en: 'Smart Search',
+                ar: 'بحث ذكي'
+            },
+            description: {
+                en: 'AI-powered search helps your customers find answers instantly with natural language queries.',
+                ar: 'بحث مدعوم بالذكاء الاصطناعي يساعد عملاءك على إيجاد الإجابات فوراً باستخدام الاستعلامات الطبيعية.'
+            },
         },
         {
             icon: Sparkles,
-            title: 'AI Assistant',
-            description: 'Built-in chat assistant powered by Google Gemini provides intelligent, contextual responses.',
-            color: 'from-purple-500 to-pink-500',
+            title: {
+                en: 'AI Assistant',
+                ar: 'مساعد ذكي'
+            },
+            description: {
+                en: 'Built-in chat assistant powered by Google Gemini provides intelligent, contextual responses.',
+                ar: 'مساعد محادثة مدمج مدعوم بـ Google Gemini يقدم استجابات ذكية وسياقية.'
+            },
         },
         {
             icon: BarChart3,
-            title: 'Analytics Dashboard',
-            description: 'Track top questions, popular keywords, and user behavior to improve your content.',
-            color: 'from-orange-500 to-red-500',
+            title: {
+                en: 'Analytics Dashboard',
+                ar: 'لوحة التحليلات'
+            },
+            description: {
+                en: 'Track top questions, popular keywords, and user behavior to improve your content.',
+                ar: 'تتبع الأسئلة الأكثر شيوعاً والكلمات المفتاحية وسلوك المستخدمين لتحسين محتواك.'
+            },
         },
         {
             icon: Users,
-            title: 'Multi-Tenant',
-            description: 'Each client gets their own isolated knowledge base with custom branding and settings.',
-            color: 'from-green-500 to-emerald-500',
+            title: {
+                en: 'Multi-Tenant',
+                ar: 'متعدد العملاء'
+            },
+            description: {
+                en: 'Each client gets their own isolated knowledge base with custom branding and settings.',
+                ar: 'كل عميل يحصل على قاعدته المعرفية المعزولة بعلامة تجارية وإعدادات مخصصة.'
+            },
         },
         {
             icon: Globe,
-            title: 'Bilingual Support',
-            description: 'Full support for English and Arabic with RTL layout switching.',
-            color: 'from-indigo-500 to-purple-500',
+            title: {
+                en: 'Bilingual Support',
+                ar: 'دعم ثنائي اللغة'
+            },
+            description: {
+                en: 'Full support for English and Arabic with RTL layout switching.',
+                ar: 'دعم كامل للإنجليزية والعربية مع تبديل اتجاه القراءة.'
+            },
         },
         {
             icon: Shield,
-            title: 'Secure & Private',
-            description: 'Row-level security ensures complete data isolation between tenants.',
-            color: 'from-slate-500 to-gray-600',
+            title: {
+                en: 'Secure & Private',
+                ar: 'آمن وخاص'
+            },
+            description: {
+                en: 'Row-level security ensures complete data isolation between tenants.',
+                ar: 'الأمان على مستوى الصف يضمن عزل البيانات الكامل بين العملاء.'
+            },
         },
     ];
 
     const steps = [
         {
             number: '01',
-            title: 'Sign Up',
-            description: 'Create your account in seconds with just an email and password.',
+            title: {
+                en: 'Sign Up',
+                ar: 'سجّل'
+            },
+            description: {
+                en: 'Create your account in seconds with just an email and password.',
+                ar: 'أنشئ حسابك في ثوانٍ بمجرد بريد إلكتروني وكلمة مرور.'
+            },
             icon: Users,
         },
         {
             number: '02',
-            title: 'Configure',
-            description: 'Name your knowledge base, add your Gemini API key, and choose your brand colors.',
+            title: {
+                en: 'Configure',
+                ar: 'اضبط'
+            },
+            description: {
+                en: 'Name your knowledge base, add your Gemini API key, and choose your brand colors.',
+                ar: 'اختر اسم قاعدتك المعرفية، أضف مفتاح Gemini API، واختر ألوان علامتك التجارية.'
+            },
             icon: Lightbulb,
         },
         {
             number: '03',
-            title: 'Add Content',
-            description: 'Create Q&A entries with our AI-powered auto-fill or manually add your content.',
+            title: {
+                en: 'Add Content',
+                ar: 'أضف المحتوى'
+            },
+            description: {
+                en: 'Create Q&A entries with our AI-powered auto-fill or manually add your content.',
+                ar: 'أنشئ إدخالات الأسئلة والأجوبة بالملء التلقائي المدعوم بالذكاء الاصطناعي أو أضف محتواك يدوياً.'
+            },
             icon: BookOpen,
         },
         {
             number: '04',
-            title: 'Go Live',
-            description: 'Share your unique URL with customers and start reducing support tickets.',
+            title: {
+                en: 'Go Live',
+                ar: 'انطلق'
+            },
+            description: {
+                en: 'Share your unique URL with customers and start reducing support tickets.',
+                ar: 'شارك رابطك الفريد مع العملاء وابدأ بتقليل تذاكر الدعم.'
+            },
             icon: Zap,
         },
     ];
 
     return (
-        <div className="min-h-screen bg-white overflow-hidden" ref={heroRef}>
+        <div className="min-h-screen bg-daleel-deep-space overflow-hidden circuit-pattern" ref={heroRef}>
             {/* Navigation */}
-            <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 backdrop-blur-lg border-b border-gray-100">
+            <nav className="fixed top-0 left-0 right-0 z-50 bg-daleel-deep-space/80 backdrop-blur-lg border-b border-daleel-cyan/20">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-white" />
+                            <div className="w-10 h-10 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon">
+                                <CircuitBoard className="w-5 h-5 text-daleel-neon" />
                             </div>
-                            <span className="text-xl font-bold text-gray-900">KnowledgeHub</span>
+                            <div>
+                                <span className="text-xl font-bold text-daleel-pure-light">
+                                    {language === 'ar' ? 'دليل' : 'Daleel'}
+                                </span>
+                                <p className="text-xs text-daleel-cyan">{t('brand.tagline')}</p>
+                            </div>
                         </div>
                         <div className="flex items-center gap-4">
+                            <button
+                                onClick={toggleLanguage}
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-daleel-neon/10 hover:bg-daleel-neon/20 transition-all text-sm border border-daleel-neon/30 hover:border-daleel-neon glow-hover text-daleel-pure-light"
+                            >
+                                <Globe size={14} />
+                                <span className="font-bold">{language === 'ar' ? 'EN' : 'ع'}</span>
+                            </button>
                             {user ? (
                                 <Link
                                     to="/dashboard"
-                                    className="flex items-center gap-2 px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:shadow-lg transition-all"
+                                    className="flex items-center gap-2 px-5 py-2.5 bg-daleel-gradient text-daleel-deep-space font-semibold rounded-full glow-neon hover:shadow-lg transition-all"
                                 >
                                     <LayoutDashboard className="w-4 h-4" />
-                                    Dashboard
+                                    {t('dashboard.title')}
                                 </Link>
                             ) : (
                                 <>
                                     <Link
                                         to="/login"
-                                        className="text-gray-600 hover:text-gray-900 font-medium transition-colors"
+                                        className="text-daleel-pure-light hover:text-daleel-cyan font-medium transition-colors"
                                     >
-                                        Sign In
+                                        {t('common.login')}
                                     </Link>
                                     <Link
                                         to="/signup"
-                                        className="px-5 py-2.5 bg-gray-900 text-white font-semibold rounded-full hover:bg-gray-800 transition-all hover:shadow-lg"
+                                        className="px-5 py-2.5 bg-daleel-neon text-daleel-deep-space font-semibold rounded-full hover:bg-daleel-green transition-all glow-neon"
                                     >
-                                        Get Started Free
+                                        {t('landing.hero.cta')}
                                     </Link>
                                 </>
                             )}
@@ -241,105 +312,121 @@ export default function Landing() {
 
             {/* Hero Section */}
             <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative">
-                {/* Background gradient */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 -z-10" />
-                <div className="absolute top-20 left-10 w-72 h-72 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-                <div className="absolute top-40 right-10 w-72 h-72 bg-purple-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-orange-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                {/* Background gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/10 via-daleel-deep-space to-daleel-green/10 -z-10" />
+                <div className="absolute top-20 left-10 w-72 h-72 bg-daleel-neon/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                <div className="absolute top-40 right-10 w-72 h-72 bg-daleel-cyan/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-daleel-green/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
 
                 <div className="max-w-7xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         {/* Left content */}
-                        <div className="text-center max-w-4xl mx-auto hero-content">
-                            <div className="hero-badge inline-flex items-center px-4 py-2 rounded-full glass-card mb-8">
-                                <Zap className="w-4 h-4 text-amber-500 mr-2" />
-                                <span className="text-sm font-semibold text-gray-700">AI-Powered Verification</span>
+                        <div className={`${isRTL ? 'text-right' : 'text-left'} max-w-4xl mx-auto hero-content`}>
+                            <div className="hero-badge inline-flex items-center px-4 py-2 rounded-full bg-daleel-tech-slate border border-daleel-cyan/30 mb-8">
+                                <Zap className="w-4 h-4 text-daleel-neon mr-2" />
+                                <span className="text-sm font-semibold text-daleel-pure-light">{t('landing.hero.title')}</span>
                             </div>
 
-                            <h1 className="hero-title text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
-                                Build Your
-                                <span className="block bg-gradient-to-r from-blue-600 via-purple-600 to-orange-500 bg-clip-text text-transparent">
-                                    AI Knowledge Base
-                                </span>
+                            <h1 className="hero-title text-5xl sm:text-6xl lg:text-7xl font-bold text-daleel-pure-light leading-tight mb-6" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                                {language === 'ar' ? (
+                                    <>
+                                        دليلك الذكي
+                                        <span className="block text-daleel-gradient">
+                                            نحو الوضوح
+                                        </span>
+                                    </>
+                                ) : (
+                                    <>
+                                        Your AI Path
+                                        <span className="block text-daleel-gradient">
+                                            to Clarity
+                                        </span>
+                                    </>
+                                )}
                             </h1>
 
-                            <p className="hero-subtitle text-xl text-gray-600 mb-8 max-w-lg mx-auto lg:mx-0">
-                                Create a beautiful, AI-powered knowledge base for your customers in minutes.
-                                No coding required. Self-service setup.
+                            <p className="hero-subtitle text-xl text-daleel-pure-light/80 mb-8 max-w-lg">
+                                {t('landing.hero.subtitle')}
                             </p>
 
-                            <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center lg:justify-start mb-12">
+                            <div className={`hero-buttons flex flex-col sm:flex-row gap-4 ${isRTL ? 'justify-end' : 'justify-start'} mb-12`}>
                                 <Link
                                     to="/signup"
-                                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-full hover:shadow-xl hover:shadow-purple-500/25 transition-all text-lg"
+                                    className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-daleel-neon text-daleel-deep-space font-semibold rounded-full glow-neon-lg hover:bg-daleel-green transition-all text-lg"
                                 >
-                                    Start Building Free
-                                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                                    {t('landing.hero.cta')}
+                                    <ArrowRight className={`w-5 h-5 group-hover:${isRTL ? '-translate-x-1' : 'translate-x-1'} transition-transform`} />
                                 </Link>
                                 <Link
                                     to="/login"
-                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-700 font-semibold rounded-full border border-gray-200 hover:border-gray-300 hover:shadow-lg transition-all text-lg"
+                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-daleel-tech-slate text-daleel-pure-light font-semibold rounded-full border border-daleel-cyan/30 hover:border-daleel-cyan hover:bg-daleel-tech-slate/80 transition-all text-lg"
                                 >
-                                    Sign In
+                                    {t('common.login')}
                                 </Link>
                             </div>
 
-                            <div className="hero-stats flex items-center justify-center lg:justify-start gap-8">
+                            <div className={`hero-stats flex items-center ${isRTL ? 'justify-end' : 'justify-start'} gap-8`}>
                                 <div>
-                                    <div className="text-3xl font-bold text-gray-900">5 min</div>
-                                    <div className="text-sm text-gray-500">Setup Time</div>
+                                    <div className="text-3xl font-bold text-daleel-neon">5 {language === 'ar' ? 'دقائق' : 'min'}</div>
+                                    <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'وقت الإعداد' : 'Setup Time'}</div>
                                 </div>
-                                <div className="w-px h-12 bg-gray-200" />
+                                <div className="w-px h-12 bg-daleel-cyan/30" />
                                 <div>
-                                    <div className="text-3xl font-bold text-gray-900">100%</div>
-                                    <div className="text-sm text-gray-500">Self-Service</div>
+                                    <div className="text-3xl font-bold text-daleel-cyan">100%</div>
+                                    <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'خدمة ذاتية' : 'Self-Service'}</div>
                                 </div>
-                                <div className="w-px h-12 bg-gray-200" />
+                                <div className="w-px h-12 bg-daleel-cyan/30" />
                                 <div>
-                                    <div className="text-3xl font-bold text-gray-900">Free</div>
-                                    <div className="text-sm text-gray-500">To Start</div>
+                                    <div className="text-3xl font-bold text-daleel-green">{language === 'ar' ? 'مجاني' : 'Free'}</div>
+                                    <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'للبدء' : 'To Start'}</div>
                                 </div>
                             </div>
                         </div>
 
                         {/* Right visual */}
-                        <div className="hero-visual relative lg:pl-8">
+                        <div className={`hero-visual relative ${isRTL ? 'lg:pr-8' : 'lg:pl-8'}`}>
                             <div className="relative">
                                 {/* Main card */}
-                                <div className="floating-card bg-white rounded-2xl shadow-2xl p-6 border border-gray-100">
+                                <div className="floating-card bg-daleel-tech-slate rounded-2xl shadow-2xl p-6 border border-daleel-cyan/30 glow-cyan">
                                     <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center">
-                                            <MessageSquare className="w-5 h-5 text-white" />
+                                        <div className="w-10 h-10 bg-daleel-gradient rounded-xl flex items-center justify-center glow-neon">
+                                            <MessageSquare className="w-5 h-5 text-daleel-deep-space" />
                                         </div>
                                         <div>
-                                            <div className="font-semibold text-gray-900">AI Assistant</div>
-                                            <div className="text-sm text-green-500 flex items-center gap-1">
-                                                <span className="w-2 h-2 bg-green-500 rounded-full" /> Online
+                                            <div className="font-semibold text-daleel-pure-light">{t('ai.greeting')}</div>
+                                            <div className="text-sm text-daleel-green flex items-center gap-1">
+                                                <span className="w-2 h-2 bg-daleel-green rounded-full" /> {language === 'ar' ? 'متاح' : 'Online'}
                                             </div>
                                         </div>
                                     </div>
                                     <div className="space-y-3">
-                                        <div className="bg-gray-50 rounded-xl p-3 text-sm text-gray-600">
-                                            How do I track my order?
+                                        <div className="bg-daleel-deep-space rounded-xl p-3 text-sm text-daleel-pure-light/80 border border-daleel-cyan/20">
+                                            {language === 'ar' ? 'كيف أتتبع طلبي؟' : 'How do I track my order?'}
                                         </div>
-                                        <div className="bg-gradient-to-r from-blue-500 to-purple-500 rounded-xl p-3 text-sm text-white">
-                                            You can track your order by logging into your account and clicking on "My Orders". There you'll find real-time tracking information.
+                                        <div className="bg-daleel-gradient rounded-xl p-3 text-sm text-daleel-deep-space font-medium">
+                                            {language === 'ar'
+                                                ? 'يمكنك تتبع طلبك بتسجيل الدخول إلى حسابك والنقر على "طلباتي". ستجد معلومات التتبع في الوقت الفعلي.'
+                                                : 'You can track your order by logging into your account and clicking on "My Orders". There you\'ll find real-time tracking information.'}
                                         </div>
                                     </div>
                                 </div>
 
                                 {/* Floating mini cards */}
-                                <div className="floating-card absolute -top-4 -right-4 bg-white rounded-xl shadow-lg p-3 border border-gray-100">
+                                <div className={`floating-card absolute -top-4 ${isRTL ? '-left-4' : '-right-4'} bg-daleel-tech-slate rounded-xl shadow-lg p-3 border border-daleel-neon/30 glow-neon`}>
                                     <div className="flex items-center gap-2">
-                                        <BarChart3 className="w-5 h-5 text-orange-500" />
-                                        <span className="text-sm font-medium text-gray-700">+42% less tickets</span>
+                                        <BarChart3 className="w-5 h-5 text-daleel-neon" />
+                                        <span className="text-sm font-medium text-daleel-pure-light">
+                                            {language === 'ar' ? '42٪ أقل تذاكر' : '+42% less tickets'}
+                                        </span>
                                     </div>
                                 </div>
 
-                                <div className="floating-card absolute -bottom-4 -left-4 bg-white rounded-xl shadow-lg p-3 border border-gray-100">
+                                <div className={`floating-card absolute -bottom-4 ${isRTL ? '-right-4' : '-left-4'} bg-daleel-tech-slate rounded-xl shadow-lg p-3 border border-daleel-cyan/30 glow-cyan`}>
                                     <div className="flex items-center gap-2">
-                                        <Search className="w-5 h-5 text-blue-500" />
-                                        <span className="text-sm font-medium text-gray-700">Smart Search</span>
+                                        <Search className="w-5 h-5 text-daleel-cyan" />
+                                        <span className="text-sm font-medium text-daleel-pure-light">
+                                            {language === 'ar' ? 'بحث ذكي' : 'Smart Search'}
+                                        </span>
                                     </div>
                                 </div>
                             </div>
@@ -349,14 +436,16 @@ export default function Landing() {
             </section>
 
             {/* Features Section */}
-            <section ref={featuresRef} className="py-24 px-4 sm:px-6 lg:px-8 bg-gray-50">
+            <section ref={featuresRef} className="py-24 px-4 sm:px-6 lg:px-8 bg-daleel-tech-slate/30">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-                            Everything You Need
+                    <div className={`${isRTL ? 'text-right' : 'text-center'} mb-16`}>
+                        <h2 className="text-4xl sm:text-5xl font-bold text-daleel-pure-light mb-4" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                            {language === 'ar' ? 'كل ما تحتاجه' : 'Everything You Need'}
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            Powerful features to build, manage, and scale your customer support knowledge base.
+                        <p className="text-xl text-daleel-pure-light/70 max-w-2xl mx-auto">
+                            {language === 'ar'
+                                ? 'ميزات قوية لبناء وإدارة وتوسيع قاعدة معرفة دعم العملاء الخاصة بك.'
+                                : 'Powerful features to build, manage, and scale your customer support knowledge base.'}
                         </p>
                     </div>
 
@@ -364,13 +453,13 @@ export default function Landing() {
                         {features.map((feature, index) => (
                             <div
                                 key={index}
-                                className="feature-card bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-xl hover:border-gray-200 transition-all duration-300 group"
+                                className="feature-card bg-daleel-tech-slate rounded-2xl p-8 border border-daleel-cyan/20 hover:border-daleel-cyan/60 transition-all duration-300 group border-glow-hover"
                             >
-                                <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform`}>
-                                    <feature.icon className="w-7 h-7 text-white" />
+                                <div className="w-14 h-14 bg-daleel-gradient rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform glow-neon">
+                                    <feature.icon className="w-7 h-7 text-daleel-deep-space" />
                                 </div>
-                                <h3 className="text-xl font-bold text-gray-900 mb-3">{feature.title}</h3>
-                                <p className="text-gray-600 leading-relaxed">{feature.description}</p>
+                                <h3 className="text-xl font-bold text-daleel-pure-light mb-3">{feature.title[language]}</h3>
+                                <p className="text-daleel-pure-light/70 leading-relaxed">{feature.description[language]}</p>
                             </div>
                         ))}
                     </div>
@@ -380,31 +469,33 @@ export default function Landing() {
             {/* How It Works Section */}
             <section ref={howItWorksRef} className="py-24 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
-                    <div className="text-center mb-16">
-                        <h2 className="text-4xl sm:text-5xl font-bold text-gray-900 mb-4">
-                            Get Started in 4 Simple Steps
+                    <div className={`${isRTL ? 'text-right' : 'text-center'} mb-16`}>
+                        <h2 className="text-4xl sm:text-5xl font-bold text-daleel-pure-light mb-4" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                            {language === 'ar' ? 'ابدأ في 4 خطوات بسيطة' : 'Get Started in 4 Simple Steps'}
                         </h2>
-                        <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-                            From sign up to live knowledge base in under 5 minutes.
+                        <p className="text-xl text-daleel-pure-light/70 max-w-2xl mx-auto">
+                            {language === 'ar'
+                                ? 'من التسجيل إلى قاعدة معرفية حية في أقل من 5 دقائق.'
+                                : 'From sign up to live knowledge base in under 5 minutes.'}
                         </p>
                     </div>
 
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {steps.map((step, index) => (
                             <div key={index} className="step-card relative">
-                                <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-100 hover:shadow-lg transition-all h-full">
-                                    <div className="text-6xl font-bold bg-gradient-to-br from-blue-100 to-purple-100 bg-clip-text text-transparent mb-4">
+                                <div className="bg-daleel-tech-slate rounded-2xl p-8 border border-daleel-cyan/20 hover:border-daleel-neon/60 transition-all h-full border-glow-hover">
+                                    <div className="text-6xl font-bold text-daleel-gradient mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                                         {step.number}
                                     </div>
-                                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-500 rounded-xl flex items-center justify-center mb-4">
-                                        <step.icon className="w-6 h-6 text-white" />
+                                    <div className="w-12 h-12 bg-daleel-gradient rounded-xl flex items-center justify-center mb-4 glow-neon">
+                                        <step.icon className="w-6 h-6 text-daleel-deep-space" />
                                     </div>
-                                    <h3 className="text-xl font-bold text-gray-900 mb-2">{step.title}</h3>
-                                    <p className="text-gray-600">{step.description}</p>
+                                    <h3 className="text-xl font-bold text-daleel-pure-light mb-2">{step.title[language]}</h3>
+                                    <p className="text-daleel-pure-light/70">{step.description[language]}</p>
                                 </div>
                                 {index < steps.length - 1 && (
-                                    <div className="hidden lg:block absolute top-1/2 -right-4 transform -translate-y-1/2">
-                                        <ArrowRight className="w-8 h-8 text-gray-300" />
+                                    <div className={`hidden lg:block absolute top-1/2 ${isRTL ? '-left-4' : '-right-4'} transform -translate-y-1/2`}>
+                                        <ArrowRight className="w-8 h-8 text-daleel-cyan/50" />
                                     </div>
                                 )}
                             </div>
@@ -416,39 +507,40 @@ export default function Landing() {
             {/* CTA Section */}
             <section ref={ctaRef} className="py-24 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-4xl mx-auto">
-                    <div className="cta-content relative bg-gradient-to-br from-blue-600 via-purple-600 to-orange-500 rounded-3xl p-12 text-center overflow-hidden">
-                        {/* Decorative elements */}
-                        <div className="absolute top-0 left-0 w-64 h-64 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2" />
-                        <div className="absolute bottom-0 right-0 w-48 h-48 bg-white/10 rounded-full translate-x-1/4 translate-y-1/4" />
+                    <div className="cta-content relative bg-daleel-gradient rounded-3xl p-12 text-center overflow-hidden glow-neon-lg">
+                        {/* Circuit pattern overlay */}
+                        <div className="absolute inset-0 circuit-pattern opacity-20" />
 
                         <div className="relative z-10">
-                            <h2 className="text-4xl sm:text-5xl font-bold text-white mb-6">
-                                Ready to Transform Your Support?
+                            <h2 className="text-4xl sm:text-5xl font-bold text-daleel-deep-space mb-6" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                                {language === 'ar' ? 'جاهز لتحويل دعمك؟' : 'Ready to Transform Your Support?'}
                             </h2>
-                            <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-                                Join teams who've reduced support tickets by up to 50% with AI-powered knowledge bases.
+                            <p className="text-xl text-daleel-deep-space/80 mb-8 max-w-2xl mx-auto">
+                                {language === 'ar'
+                                    ? 'انضم إلى الفرق التي قللت تذاكر الدعم بنسبة تصل إلى 50٪ بقواعد المعرفة المدعومة بالذكاء الاصطناعي.'
+                                    : 'Join teams who\'ve reduced support tickets by up to 50% with AI-powered knowledge bases.'}
                             </p>
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Link
                                     to="/signup"
-                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-white text-gray-900 font-semibold rounded-full hover:shadow-xl transition-all text-lg"
+                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-daleel-deep-space text-daleel-neon font-semibold rounded-full hover:shadow-xl transition-all text-lg border-2 border-daleel-deep-space hover:border-daleel-tech-slate"
                                 >
-                                    Get Started Free
+                                    {t('landing.hero.cta')}
                                     <ArrowRight className="w-5 h-5" />
                                 </Link>
                             </div>
-                            <div className="flex items-center justify-center gap-6 mt-8 text-white/80 text-sm">
+                            <div className={`flex items-center justify-center gap-6 mt-8 text-daleel-deep-space/80 text-sm flex-wrap`}>
                                 <div className="flex items-center gap-2">
                                     <CheckCircle2 className="w-5 h-5" />
-                                    No credit card required
+                                    {language === 'ar' ? 'لا تحتاج بطاقة ائتمان' : 'No credit card required'}
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <CheckCircle2 className="w-5 h-5" />
-                                    5-minute setup
+                                    {language === 'ar' ? 'إعداد 5 دقائق' : '5-minute setup'}
                                 </div>
                                 <div className="flex items-center gap-2">
                                     <CheckCircle2 className="w-5 h-5" />
-                                    Cancel anytime
+                                    {language === 'ar' ? 'إلغاء في أي وقت' : 'Cancel anytime'}
                                 </div>
                             </div>
                         </div>
@@ -457,17 +549,22 @@ export default function Landing() {
             </section>
 
             {/* Footer */}
-            <footer className="bg-gray-900 text-gray-400 py-12 px-4 sm:px-6 lg:px-8">
+            <footer className="bg-daleel-tech-slate border-t border-daleel-cyan/20 py-12 px-4 sm:px-6 lg:px-8">
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-white" />
+                            <div className="w-10 h-10 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon">
+                                <CircuitBoard className="w-5 h-5 text-daleel-neon" />
                             </div>
-                            <span className="text-xl font-bold text-white">KnowledgeHub</span>
+                            <div>
+                                <span className="text-xl font-bold text-daleel-pure-light">
+                                    {language === 'ar' ? 'دليل' : 'Daleel'}
+                                </span>
+                                <p className="text-xs text-daleel-cyan">{t('brand.tagline')}</p>
+                            </div>
                         </div>
-                        <div className="text-center md:text-right">
-                            <p>&copy; {new Date().getFullYear()} KnowledgeHub. All rights reserved.</p>
+                        <div className="text-center md:text-right text-daleel-pure-light/60">
+                            <p>{t('landing.footer.copyright')}</p>
                         </div>
                     </div>
                 </div>

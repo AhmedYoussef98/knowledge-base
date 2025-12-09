@@ -2,8 +2,10 @@ import React, { useState, useEffect, useRef } from 'react';
 import { gsap } from 'gsap';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useLanguage } from '../contexts/LanguageContext';
+import { useTranslation } from '../i18n/useTranslation';
 import { autoAcceptPendingInvites } from '../services/tenantApi';
-import { Mail, Lock, UserPlus, Loader2, AlertCircle, Sparkles, CheckCircle2 } from 'lucide-react';
+import { Mail, Lock, UserPlus, Loader2, AlertCircle, CircuitBoard, CheckCircle2, Globe } from 'lucide-react';
 
 export default function SignUp() {
     const [email, setEmail] = useState('');
@@ -16,6 +18,8 @@ export default function SignUp() {
     const [resendLoading, setResendLoading] = useState(false);
     const [resendSuccess, setResendSuccess] = useState(false);
     const { signUp, user, resendVerification } = useAuth();
+    const { language, toggleLanguage, isRTL } = useLanguage();
+    const { t } = useTranslation();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -62,12 +66,12 @@ export default function SignUp() {
         setError('');
 
         if (password !== confirmPassword) {
-            setError('Passwords do not match');
+            setError(language === 'ar' ? 'كلمات المرور غير متطابقة' : 'Passwords do not match');
             return;
         }
 
         if (password.length < 6) {
-            setError('Password must be at least 6 characters');
+            setError(language === 'ar' ? 'كلمة المرور يجب أن تكون 6 أحرف على الأقل' : 'Password must be at least 6 characters');
             return;
         }
 
@@ -82,7 +86,7 @@ export default function SignUp() {
             }
             // Check for rate limits or other specific errors
             else if (signUpError.message.includes('rate limit')) {
-                setError('Too many requests. Please try again later.');
+                setError(language === 'ar' ? 'طلبات كثيرة جداً. حاول مرة أخرى لاحقاً.' : 'Too many requests. Please try again later.');
             }
             else {
                 setError(signUpError.message);
@@ -111,25 +115,34 @@ export default function SignUp() {
     // Email confirmation sent
     if (emailSent) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
-                <div className="w-full max-w-md">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center">
-                        <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <CheckCircle2 className="w-8 h-8 text-green-500" />
+            <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4 relative">
+                {/* Background gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/5 via-daleel-deep-space to-daleel-green/5 -z-10" />
+                <div className="absolute top-20 left-10 w-96 h-96 bg-daleel-green/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-daleel-cyan/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+
+                <div className="w-full max-w-md relative z-10">
+                    <div className="bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-green/30 p-8 text-center glow-cyan">
+                        <div className="w-16 h-16 bg-daleel-green/20 border-2 border-daleel-green rounded-full flex items-center justify-center mx-auto mb-6 glow-neon">
+                            <CheckCircle2 className="w-8 h-8 text-daleel-green" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">Check Your Email</h1>
-                        <p className="text-gray-600 mb-6">
-                            We've sent a confirmation link to <strong>{email}</strong>
+                        <h1 className="text-2xl font-bold text-daleel-pure-light mb-2" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                            {t('auth.verifyEmail')}
+                        </h1>
+                        <p className="text-daleel-pure-light/70 mb-6">
+                            {t('auth.verifyEmailMessage')} <strong className="text-daleel-neon">{email}</strong>
                         </p>
-                        <p className="text-sm text-gray-500 mb-8">
-                            Click the link in the email to activate your account, then come back and sign in.
+                        <p className="text-sm text-daleel-pure-light/60 mb-8">
+                            {language === 'ar'
+                                ? 'انقر على الرابط في البريد الإلكتروني لتفعيل حسابك، ثم عد وسجّل الدخول.'
+                                : 'Click the link in the email to activate your account, then come back and sign in.'}
                         </p>
                         <div className="flex flex-col gap-3 w-full">
                             <Link
                                 to={getLoginLink()}
-                                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-daleel-gradient text-daleel-deep-space font-semibold rounded-xl hover:shadow-lg transition-all glow-neon"
                             >
-                                Go to Sign In
+                                {language === 'ar' ? 'اذهب إلى تسجيل الدخول' : 'Go to Sign In'}
                             </Link>
 
                             {!resendSuccess ? (
@@ -141,13 +154,15 @@ export default function SignUp() {
                                         setResendLoading(false);
                                     }}
                                     disabled={resendLoading}
-                                    className="text-sm text-gray-500 hover:text-gray-700 underline disabled:opacity-50"
+                                    className="text-sm text-daleel-cyan hover:text-daleel-neon underline disabled:opacity-50 transition-colors"
                                 >
-                                    {resendLoading ? 'Sending...' : 'Resend verification email'}
+                                    {resendLoading
+                                        ? (language === 'ar' ? 'جاري الإرسال...' : 'Sending...')
+                                        : t('auth.resendVerification')}
                                 </button>
                             ) : (
-                                <p className="text-sm text-green-600 font-medium animate-fade-in">
-                                    Email resent successfully!
+                                <p className="text-sm text-daleel-green font-medium animate-fade-in">
+                                    {language === 'ar' ? 'تم إرسال البريد بنجاح!' : 'Email resent successfully!'}
                                 </p>
                             )}
                         </div>
@@ -160,27 +175,34 @@ export default function SignUp() {
     // Existing User Found
     if (existingUser) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
-                <div className="w-full max-w-md">
-                    <div className="bg-white rounded-2xl shadow-xl p-8 text-center animate-fade-in-up">
-                        <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Sparkles className="w-8 h-8 text-blue-600" />
+            <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4 relative">
+                {/* Background gradient overlays */}
+                <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/5 via-daleel-deep-space to-daleel-neon/5 -z-10" />
+                <div className="absolute top-20 left-10 w-96 h-96 bg-daleel-cyan/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                <div className="absolute bottom-20 right-10 w-96 h-96 bg-daleel-neon/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+
+                <div className="w-full max-w-md relative z-10">
+                    <div className="bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-cyan/30 p-8 text-center animate-fade-in-up glow-cyan">
+                        <div className="w-16 h-16 bg-daleel-cyan/20 border-2 border-daleel-cyan rounded-full flex items-center justify-center mx-auto mb-6 glow-cyan">
+                            <CircuitBoard className="w-8 h-8 text-daleel-cyan" />
                         </div>
-                        <h1 className="text-2xl font-bold text-gray-900 mb-2">You already have an account</h1>
-                        <p className="text-gray-600 mb-8">
-                            The email <strong>{email}</strong> is already registered.
+                        <h1 className="text-2xl font-bold text-daleel-pure-light mb-2" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                            {language === 'ar' ? 'لديك حساب بالفعل' : 'You already have an account'}
+                        </h1>
+                        <p className="text-daleel-pure-light/70 mb-8">
+                            {language === 'ar' ? 'البريد الإلكتروني' : 'The email'} <strong className="text-daleel-neon">{email}</strong> {language === 'ar' ? 'مسجّل بالفعل.' : 'is already registered.'}
                         </p>
                         <Link
                             to={getLoginLink()}
-                            className="inline-flex items-center gap-2 px-8 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transition-all w-full justify-center"
+                            className="inline-flex items-center gap-2 px-8 py-3 bg-daleel-cyan text-daleel-deep-space font-semibold rounded-xl hover:bg-daleel-neon transition-all w-full justify-center glow-cyan"
                         >
-                            Sign In Instead
+                            {language === 'ar' ? 'سجّل الدخول بدلاً من ذلك' : 'Sign In Instead'}
                         </Link>
                         <button
                             onClick={() => setExistingUser(false)}
-                            className="mt-4 text-sm text-gray-500 hover:text-gray-700 underline"
+                            className="mt-4 text-sm text-daleel-pure-light/50 hover:text-daleel-cyan underline transition-colors"
                         >
-                            Use a different email
+                            {language === 'ar' ? 'استخدم بريداً إلكترونياً مختلفاً' : 'Use a different email'}
                         </button>
                     </div>
                 </div>
@@ -189,53 +211,76 @@ export default function SignUp() {
     }
 
     return (
-        <div ref={containerRef} className="min-h-screen bg-gradient-to-br from-blue-50 via-purple-50 to-orange-50 flex items-center justify-center p-4">
-            <div className="w-full max-w-md">
+        <div ref={containerRef} className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4 relative">
+            {/* Background gradient overlays */}
+            <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/5 via-daleel-deep-space to-daleel-neon/5 -z-10" />
+            <div className="absolute top-20 left-10 w-96 h-96 bg-daleel-neon/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+            <div className="absolute bottom-20 right-10 w-96 h-96 bg-daleel-cyan/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+
+            <div className="w-full max-w-md relative z-10">
+                {/* Language Toggle - Top Right */}
+                <div className={`absolute -top-16 ${isRTL ? 'left-0' : 'right-0'}`}>
+                    <button
+                        onClick={toggleLanguage}
+                        className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-daleel-neon/10 hover:bg-daleel-neon/20 transition-all text-sm border border-daleel-neon/30 hover:border-daleel-neon glow-hover text-daleel-pure-light"
+                    >
+                        <Globe size={14} />
+                        <span className="font-bold">{language === 'ar' ? 'EN' : 'ع'}</span>
+                    </button>
+                </div>
+
                 {/* Logo/Brand */}
-                <div className="text-center mb-8">
+                <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
                     <Link to="/" className="inline-block">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl shadow-lg mb-4">
-                            <Sparkles className="w-8 h-8 text-white" />
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-4 glow-neon">
+                            <CircuitBoard className="w-8 h-8 text-daleel-neon" />
                         </div>
                     </Link>
-                    <h1 className="text-3xl font-bold text-gray-900">Create your account</h1>
-                    <p className="text-gray-600 mt-2">
+                    <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                        {t('auth.signupTitle')}
+                    </h1>
+                    <p className="text-daleel-pure-light/70 mt-2">
                         {returnTo?.includes('invite')
-                            ? 'Sign up to accept your invitation'
-                            : 'Start building your knowledge base in minutes'
+                            ? (language === 'ar' ? 'سجّل لقبول دعوتك' : 'Sign up to accept your invitation')
+                            : t('auth.signupSubtitle')
                         }
                     </p>
                 </div>
 
                 {/* Form Card */}
-                <div ref={formRef} className="bg-white rounded-2xl shadow-xl p-8">
+                <div ref={formRef} className="bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-cyan/20 p-8 glow-cyan">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                {t('auth.email')}
+                            </label>
                             <div className="relative">
-                                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Mail className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-5 h-5 text-daleel-cyan`} />
                                 <input
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
                                     placeholder="you@company.com"
                                     required
+                                    dir={isRTL ? 'rtl' : 'ltr'}
                                 />
                             </div>
                         </div>
 
                         {/* Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Password</label>
+                            <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                {t('auth.password')}
+                            </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Lock className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-5 h-5 text-daleel-cyan`} />
                                 <input
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
                                     placeholder="••••••••"
                                     required
                                 />
@@ -244,14 +289,16 @@ export default function SignUp() {
 
                         {/* Confirm Password */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
+                            <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
+                                {t('auth.confirmPassword')}
+                            </label>
                             <div className="relative">
-                                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Lock className={`absolute ${isRTL ? 'right-3' : 'left-3'} top-1/2 -translate-y-1/2 w-5 h-5 text-daleel-cyan`} />
                                 <input
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className="w-full pl-11 pr-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
                                     placeholder="••••••••"
                                     required
                                 />
@@ -260,7 +307,7 @@ export default function SignUp() {
 
                         {/* Error Message */}
                         {error && (
-                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-700 text-sm">
+                            <div className={`flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                                 <span>{error}</span>
                             </div>
@@ -270,37 +317,39 @@ export default function SignUp() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                            className="w-full py-3 bg-daleel-neon text-daleel-deep-space font-semibold rounded-xl hover:bg-daleel-green transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 glow-neon"
                         >
                             {loading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
                                     <UserPlus className="w-5 h-5" />
-                                    Create Account
+                                    {t('common.signup')}
                                 </>
                             )}
                         </button>
                     </form>
 
                     {/* Login Link */}
-                    <div className="mt-6 text-center text-sm text-gray-600">
-                        Already have an account?{' '}
-                        <Link to={getLoginLink()} className="text-blue-600 hover:underline font-medium">
-                            Sign in
+                    <div className={`mt-6 text-sm text-daleel-pure-light/70 ${isRTL ? 'text-right' : 'text-center'}`}>
+                        {t('auth.hasAccount')}{' '}
+                        <Link to={getLoginLink()} className="text-daleel-cyan hover:text-daleel-neon font-medium transition-colors">
+                            {t('common.login')}
                         </Link>
                     </div>
                 </div>
 
                 {/* Footer */}
-                <p className="text-center text-xs text-gray-500 mt-6">
-                    By signing up, you agree to our Terms of Service and Privacy Policy.
+                <p className={`text-xs text-daleel-pure-light/50 mt-6 ${isRTL ? 'text-right' : 'text-center'}`}>
+                    {language === 'ar'
+                        ? 'بالتسجيل، أنت توافق على شروط الخدمة وسياسة الخصوصية.'
+                        : 'By signing up, you agree to our Terms of Service and Privacy Policy.'}
                 </p>
 
                 {/* Back to Home */}
-                <div className="text-center mt-4">
-                    <Link to="/" className="text-sm text-gray-500 hover:text-gray-700 transition-colors">
-                        ← Back to home
+                <div className={`mt-4 ${isRTL ? 'text-right' : 'text-center'}`}>
+                    <Link to="/" className="text-sm text-daleel-pure-light/50 hover:text-daleel-cyan transition-colors inline-flex items-center gap-1">
+                        {isRTL ? '→' : '←'} {t('common.back')}
                     </Link>
                 </div>
             </div>
