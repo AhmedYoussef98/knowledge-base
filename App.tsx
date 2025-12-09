@@ -14,6 +14,8 @@ import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import AcceptInvite from './pages/AcceptInvite';
 import GeminiGuide from './pages/GeminiGuide';
+import ForgotPassword from './pages/ForgotPassword';
+import UpdatePassword from './pages/UpdatePassword';
 
 export default function App() {
   return (
@@ -27,6 +29,8 @@ export default function App() {
             {/* Auth routes */}
             <Route path="/signup" element={<SignUp />} />
             <Route path="/login" element={<Login />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+            <Route path="/update-password" element={<UpdatePassword />} />
 
             {/* User dashboard (central hub) */}
             <Route path="/dashboard" element={<Dashboard />} />
