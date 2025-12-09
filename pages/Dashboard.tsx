@@ -19,6 +19,14 @@ export default function Dashboard() {
     const [tenants, setTenants] = useState<TenantWithRole[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const hasAnimated = React.useRef(false);
+
+    // Import gsap dynamically or assume available via window if script, but better to import
+    // Note: User installed it via npm
+    const { gsap } = require('gsap'); // Using require to avoid import issues if not fully set up types in this context, but import is better. 
+    // Actually, stick to ES6 import as per user request example: import { gsap } from "gsap"; 
+
     useEffect(() => {
         if (!authLoading && !user) {
             navigate('/login');
@@ -49,6 +57,45 @@ export default function Dashboard() {
 
         loadDashboard();
     }, [user]);
+
+    // Animation Effect
+    useEffect(() => {
+        if (!loading && tenants.length > 0 && !hasAnimated.current && containerRef.current) {
+            const ctx = gsap.context(() => {
+                const tl = gsap.timeline();
+
+                tl.from(".dashboard-header", {
+                    y: -20,
+                    opacity: 0,
+                    duration: 0.6,
+                    ease: "power2.out"
+                })
+                    .from(".dashboard-title", {
+                        x: -20,
+                        opacity: 0,
+                        duration: 0.6,
+                        ease: "power2.out"
+                    }, "-=0.4")
+                    .from(".tenant-card", {
+                        y: 30,
+                        opacity: 0,
+                        duration: 0.6,
+                        stagger: 0.1,
+                        ease: "back.out(1.5)"
+                    }, "-=0.2")
+                    .from(".help-section", {
+                        y: 20,
+                        opacity: 0,
+                        duration: 0.6,
+                        ease: "power2.out"
+                    }, "-=0.4");
+
+                hasAnimated.current = true;
+            }, containerRef);
+
+            return () => ctx.revert();
+        }
+    }, [loading, tenants]);
 
     const handleSignOut = async () => {
         await signOut();
@@ -89,9 +136,9 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div ref={containerRef} className="min-h-screen bg-gray-50">
             {/* Header */}
-            <header className="bg-white border-b border-gray-200 sticky top-0 z-10">
+            <header className="bg-white border-b border-gray-200 sticky top-0 z-10 dashboard-header">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <div className="w-10 h-10 bg-gradient-to-br from-blue-600 to-purple-600 rounded-xl flex items-center justify-center">
@@ -118,7 +165,7 @@ export default function Dashboard() {
             {/* Main Content */}
             <main className="max-w-6xl mx-auto px-4 py-8">
                 {/* Welcome Section */}
-                <div className="mb-8">
+                <div className="mb-8 dashboard-title">
                     <h2 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
                         <LayoutDashboard className="w-8 h-8 text-blue-600" />
                         Your Knowledge Bases
@@ -152,7 +199,7 @@ export default function Dashboard() {
                             {tenants.map((tenant) => (
                                 <div
                                     key={tenant.id}
-                                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all group"
+                                    className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-lg hover:border-gray-300 transition-all group tenant-card"
                                 >
                                     {/* Color Bar */}
                                     <div
@@ -216,7 +263,7 @@ export default function Dashboard() {
                             {/* Create New Card */}
                             <Link
                                 to="/onboarding"
-                                className="bg-white rounded-xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-center hover:border-blue-400 hover:bg-blue-50 transition-all group min-h-[200px]"
+                                className="bg-white rounded-xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-center hover:border-blue-400 hover:bg-blue-50 transition-all group min-h-[200px] tenant-card"
                             >
                                 <div className="w-14 h-14 bg-gray-100 group-hover:bg-blue-100 rounded-full flex items-center justify-center mb-4 transition-colors">
                                     <Plus className="w-7 h-7 text-gray-400 group-hover:text-blue-600 transition-colors" />
@@ -233,7 +280,7 @@ export default function Dashboard() {
                 )}
 
                 {/* Help Section */}
-                <div className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white">
+                <div className="mt-12 bg-gradient-to-r from-blue-600 to-purple-600 rounded-2xl p-8 text-white help-section">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div>
                             <h3 className="text-xl font-bold mb-2">Need help getting started?</h3>

@@ -141,11 +141,7 @@ export const Navbar: React.FC<Props> = ({
             </Link>
           )}
 
-          {/* Online Status */}
-          <div className="hidden md:flex items-center gap-2 bg-black/20 px-3 py-1.5 rounded-full">
-            <div className="h-2 w-2 rounded-full bg-green-400 animate-pulse"></div>
-            <span className="text-xs text-gray-200">{t('online')}</span>
-          </div>
+          {/* Online Status Removed as requested */}
         </div>
       </div>
     </nav>

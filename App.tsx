@@ -13,6 +13,7 @@ import Settings from './pages/Settings';
 import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import AcceptInvite from './pages/AcceptInvite';
+import GeminiGuide from './pages/GeminiGuide';
 
 export default function App() {
   return (
@@ -38,6 +39,9 @@ export default function App() {
 
             {/* Invite acceptance */}
             <Route path="/invite/:token" element={<AcceptInvite />} />
+
+            {/* Guides */}
+            <Route path="/gemini-guide" element={<GeminiGuide />} />
 
             {/* Tenant-specific routes */}
             <Route path="/kb/:slug" element={<Home />} />

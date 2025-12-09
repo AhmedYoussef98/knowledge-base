@@ -378,8 +378,8 @@ export default function Settings() {
                                             <button
                                                 onClick={() => handleCopyInviteLink(invite)}
                                                 className={`p-2 rounded-lg transition-colors ${copiedInviteId === invite.id
-                                                        ? 'bg-green-100 text-green-600'
-                                                        : 'text-gray-500 hover:bg-gray-100'
+                                                    ? 'bg-green-100 text-green-600'
+                                                    : 'text-gray-500 hover:bg-gray-100'
                                                     }`}
                                                 title="Copy invite link"
                                             >
@@ -475,17 +475,13 @@ export default function Settings() {
                             className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all font-mono"
                             placeholder="AIzaSy..."
                         />
-                        <p className="text-xs text-gray-500 mt-2">
-                            Get your API key from{' '}
-                            <a
-                                href="https://aistudio.google.com/app/apikey"
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="text-blue-600 hover:underline"
-                            >
-                                Google AI Studio
-                            </a>
-                        </p>
+                        <div className="flex items-center justify-between text-xs mt-2">
+                            <p className="text-gray-500">Required for AI responses</p>
+                            <Link to="/gemini-guide" className="text-blue-600 hover:text-blue-700 font-medium hover:underline flex items-center gap-1">
+                                How to get a free key?
+                                <ExternalLink className="w-3 h-3" />
+                            </Link>
+                        </div>
                     </div>
                 </div>
 

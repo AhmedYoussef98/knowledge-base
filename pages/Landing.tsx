@@ -250,10 +250,10 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto">
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         {/* Left content */}
-                        <div className="text-center lg:text-left">
-                            <div className="hero-badge inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100 mb-6">
-                                <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                <span className="text-sm font-medium text-gray-600">Self-Service SaaS Platform</span>
+                        <div className="text-center max-w-4xl mx-auto hero-content">
+                            <div className="hero-badge inline-flex items-center px-4 py-2 rounded-full glass-card mb-8">
+                                <Zap className="w-4 h-4 text-amber-500 mr-2" />
+                                <span className="text-sm font-semibold text-gray-700">AI-Powered Verification</span>
                             </div>
 
                             <h1 className="hero-title text-5xl sm:text-6xl lg:text-7xl font-bold text-gray-900 leading-tight mb-6">
