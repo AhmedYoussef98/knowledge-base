@@ -13,7 +13,9 @@ export default function SignUp() {
     const [loading, setLoading] = useState(false);
     const [emailSent, setEmailSent] = useState(false);
     const [existingUser, setExistingUser] = useState(false);
-    const { signUp, user } = useAuth();
+    const [resendLoading, setResendLoading] = useState(false);
+    const [resendSuccess, setResendSuccess] = useState(false);
+    const { signUp, user, resendVerification } = useAuth();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
 
@@ -122,12 +124,33 @@ export default function SignUp() {
                         <p className="text-sm text-gray-500 mb-8">
                             Click the link in the email to activate your account, then come back and sign in.
                         </p>
-                        <Link
-                            to={getLoginLink()}
-                            className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
-                        >
-                            Go to Sign In
-                        </Link>
+                        <div className="flex flex-col gap-3 w-full">
+                            <Link
+                                to={getLoginLink()}
+                                className="inline-flex items-center justify-center gap-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-semibold rounded-xl hover:shadow-lg transition-all"
+                            >
+                                Go to Sign In
+                            </Link>
+
+                            {!resendSuccess ? (
+                                <button
+                                    onClick={async () => {
+                                        setResendLoading(true);
+                                        const { error } = await resendVerification(email);
+                                        if (!error) setResendSuccess(true);
+                                        setResendLoading(false);
+                                    }}
+                                    disabled={resendLoading}
+                                    className="text-sm text-gray-500 hover:text-gray-700 underline disabled:opacity-50"
+                                >
+                                    {resendLoading ? 'Sending...' : 'Resend verification email'}
+                                </button>
+                            ) : (
+                                <p className="text-sm text-green-600 font-medium animate-fade-in">
+                                    Email resent successfully!
+                                </p>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
