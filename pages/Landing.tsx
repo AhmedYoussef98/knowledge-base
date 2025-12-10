@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
@@ -21,6 +21,8 @@ import {
     LayoutDashboard
 } from 'lucide-react';
 import logo from '../src/assets/logo.png';
+import { AnimatedBackground } from '../animations';
+import { COLORS, EASING, DURATION, STAGGER } from '../animations/config/animationConfig';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -35,56 +37,94 @@ export default function Landing() {
 
     useEffect(() => {
         const ctx = gsap.context(() => {
-            // Hero animations
-            gsap.fromTo('.hero-badge',
-                { opacity: 0, y: 20 },
-                { opacity: 1, y: 0, duration: 0.8, ease: 'power3.out' }
-            );
+            // Create master timeline for hero section
+            const heroTimeline = gsap.timeline();
 
-            gsap.fromTo('.hero-title',
-                { opacity: 0, y: 40 },
-                { opacity: 1, y: 0, duration: 1, delay: 0.2, ease: 'power3.out' }
-            );
+            // Logo entrance with glow pulse
+            heroTimeline
+                .fromTo('.hero-title',
+                    { opacity: 0, y: 50, scale: 0.9 },
+                    { opacity: 1, y: 0, scale: 1, duration: 1.2, ease: EASING.snappy }
+                )
+                .fromTo('.hero-subtitle',
+                    { opacity: 0, y: 30, filter: 'blur(10px)' },
+                    { opacity: 1, y: 0, filter: 'blur(0px)', duration: 0.8, ease: EASING.snappy },
+                    '-=0.6'
+                )
+                .fromTo('.hero-buttons',
+                    { opacity: 0, y: 30 },
+                    { opacity: 1, y: 0, duration: 0.8, ease: EASING.bounce },
+                    '-=0.4'
+                )
+                .fromTo('.hero-stats .stat-item',
+                    { opacity: 0, y: 20, scale: 0.8 },
+                    {
+                        opacity: 1,
+                        y: 0,
+                        scale: 1,
+                        duration: 0.6,
+                        stagger: 0.1,
+                        ease: EASING.bounce
+                    },
+                    '-=0.3'
+                )
+                .fromTo('.hero-visual',
+                    { opacity: 0, scale: 0.8, y: 40 },
+                    { opacity: 1, scale: 1, y: 0, duration: 1, ease: EASING.snappy },
+                    '-=0.5'
+                );
 
-            gsap.fromTo('.hero-subtitle',
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.8, delay: 0.4, ease: 'power3.out' }
-            );
-
-            gsap.fromTo('.hero-buttons',
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.8, delay: 0.6, ease: 'power3.out' }
-            );
-
-            gsap.fromTo('.hero-stats',
-                { opacity: 0, y: 30 },
-                { opacity: 1, y: 0, duration: 0.8, delay: 0.8, ease: 'power3.out' }
-            );
-
-            gsap.fromTo('.hero-visual',
-                { opacity: 0, scale: 0.9 },
-                { opacity: 1, scale: 1, duration: 1.2, delay: 0.4, ease: 'power3.out' }
-            );
-
-            // Floating animation for hero visual
+            // Continuous floating animation for hero visual with different speeds
             gsap.to('.floating-card', {
-                y: -10,
+                y: -15,
+                duration: 2.5,
+                repeat: -1,
+                yoyo: true,
+                ease: EASING.gentle,
+                stagger: {
+                    each: 0.3,
+                    from: 'random',
+                },
+            });
+
+            // Add subtle rotation to floating cards
+            gsap.to('.floating-card', {
+                rotation: 2,
+                duration: 4,
+                repeat: -1,
+                yoyo: true,
+                ease: EASING.gentle,
+                stagger: {
+                    each: 0.5,
+                    from: 'random',
+                },
+            });
+
+            // Logo glow pulse
+            gsap.to('.logo-glow', {
+                opacity: 0.4,
+                scale: 1.1,
                 duration: 2,
                 repeat: -1,
                 yoyo: true,
-                ease: 'sine.inOut',
-                stagger: 0.2,
+                ease: EASING.gentle,
             });
 
-            // Features section animations
+            // Features section animations with 3D effect
             gsap.fromTo('.feature-card',
-                { opacity: 0, y: 50 },
+                {
+                    opacity: 0,
+                    y: 60,
+                    rotateX: -15,
+                    transformPerspective: 1000,
+                },
                 {
                     opacity: 1,
                     y: 0,
+                    rotateX: 0,
                     duration: 0.8,
-                    stagger: 0.15,
-                    ease: 'power3.out',
+                    stagger: STAGGER.relaxed,
+                    ease: EASING.bounce,
                     scrollTrigger: {
                         trigger: featuresRef.current,
                         start: 'top 80%',
@@ -92,15 +132,33 @@ export default function Landing() {
                 }
             );
 
-            // How it works animations
+            // Feature icon pulse animation
+            gsap.to('.feature-icon', {
+                scale: 1.1,
+                duration: 1.5,
+                repeat: -1,
+                yoyo: true,
+                ease: EASING.gentle,
+                stagger: {
+                    each: 0.2,
+                    from: 'start',
+                },
+            });
+
+            // How it works animations with connecting line effect
             gsap.fromTo('.step-card',
-                { opacity: 0, x: isRTL ? 30 : -30 },
+                {
+                    opacity: 0,
+                    x: isRTL ? 40 : -40,
+                    scale: 0.9,
+                },
                 {
                     opacity: 1,
                     x: 0,
+                    scale: 1,
                     duration: 0.8,
-                    stagger: 0.2,
-                    ease: 'power3.out',
+                    stagger: STAGGER.slow,
+                    ease: EASING.bounce,
                     scrollTrigger: {
                         trigger: howItWorksRef.current,
                         start: 'top 80%',
@@ -108,20 +166,71 @@ export default function Landing() {
                 }
             );
 
-            // CTA animation
+            // Animate step numbers
+            gsap.fromTo('.step-number',
+                { scale: 0, rotation: -180 },
+                {
+                    scale: 1,
+                    rotation: 0,
+                    duration: 0.6,
+                    stagger: STAGGER.slow,
+                    ease: EASING.bounce,
+                    scrollTrigger: {
+                        trigger: howItWorksRef.current,
+                        start: 'top 80%',
+                    },
+                }
+            );
+
+            // Animate connecting arrows
+            gsap.fromTo('.step-arrow',
+                { opacity: 0, scale: 0 },
+                {
+                    opacity: 1,
+                    scale: 1,
+                    duration: 0.4,
+                    stagger: STAGGER.slow,
+                    delay: 0.3,
+                    ease: EASING.bounce,
+                    scrollTrigger: {
+                        trigger: howItWorksRef.current,
+                        start: 'top 80%',
+                    },
+                }
+            );
+
+            // CTA animation with glow effect
             gsap.fromTo('.cta-content',
-                { opacity: 0, y: 40 },
+                {
+                    opacity: 0,
+                    y: 50,
+                    scale: 0.95,
+                },
                 {
                     opacity: 1,
                     y: 0,
+                    scale: 1,
                     duration: 1,
-                    ease: 'power3.out',
+                    ease: EASING.snappy,
                     scrollTrigger: {
                         trigger: ctaRef.current,
                         start: 'top 85%',
                     },
                 }
             );
+
+            // CTA button pulse
+            gsap.to('.cta-button', {
+                boxShadow: '0 0 30px rgba(163, 255, 71, 0.6)',
+                duration: 1.5,
+                repeat: -1,
+                yoyo: true,
+                ease: EASING.gentle,
+                scrollTrigger: {
+                    trigger: ctaRef.current,
+                    start: 'top 85%',
+                },
+            });
 
         }, heroRef);
 
@@ -298,12 +407,23 @@ export default function Landing() {
             </nav>
 
             {/* Hero Section */}
-            <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative">
+            <section className="pt-32 pb-20 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+                {/* Animated Background */}
+                <AnimatedBackground
+                    intensity="moderate"
+                    showParticles={true}
+                    showShapes={true}
+                    showMouseGlow={true}
+                    showConnections={true}
+                    enableParallax={true}
+                    className="absolute inset-0 -z-5"
+                />
+
                 {/* Background gradient overlays */}
                 <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/10 via-daleel-deep-space to-daleel-green/10 -z-10" />
-                <div className="absolute top-20 left-10 w-72 h-72 bg-daleel-neon/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-                <div className="absolute top-40 right-10 w-72 h-72 bg-daleel-cyan/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-daleel-green/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+                <div className="absolute top-20 left-10 w-72 h-72 bg-daleel-neon/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-glow" />
+                <div className="absolute top-40 right-10 w-72 h-72 bg-daleel-cyan/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-glow animation-delay-500" />
+                <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-daleel-green/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse-glow animation-delay-1000" />
 
                 <div className="max-w-7xl mx-auto">
                     {/* Centered Hero with Logo */}
@@ -312,7 +432,7 @@ export default function Landing() {
                             {/* Logo as Hero */}
                             <div className="hero-title flex justify-center mb-8">
                                 <div className="relative">
-                                    <div className="absolute inset-0 bg-daleel-gradient blur-3xl opacity-20 animate-pulse"></div>
+                                    <div className="logo-glow absolute inset-0 bg-daleel-gradient blur-3xl opacity-20"></div>
                                     <img
                                         src={logo}
                                         alt="Daleel Logo"
@@ -361,17 +481,17 @@ export default function Landing() {
                             </div>
 
                             <div className="hero-stats flex items-center justify-center gap-8 flex-wrap">
-                                <div className="text-center">
+                                <div className="stat-item text-center">
                                     <div className="text-3xl font-bold text-daleel-neon">5 {language === 'ar' ? 'دقائق' : 'min'}</div>
                                     <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'وقت الإعداد' : 'Setup Time'}</div>
                                 </div>
-                                <div className="w-px h-12 bg-daleel-cyan/30" />
-                                <div className="text-center">
+                                <div className="stat-item w-px h-12 bg-daleel-cyan/30" />
+                                <div className="stat-item text-center">
                                     <div className="text-3xl font-bold text-daleel-cyan">100%</div>
                                     <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'خدمة ذاتية' : 'Self-Service'}</div>
                                 </div>
-                                <div className="w-px h-12 bg-daleel-cyan/30" />
-                                <div className="text-center">
+                                <div className="stat-item w-px h-12 bg-daleel-cyan/30" />
+                                <div className="stat-item text-center">
                                     <div className="text-3xl font-bold text-daleel-green">{language === 'ar' ? 'مجاني' : 'Free'}</div>
                                     <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'للبدء' : 'To Start'}</div>
                                 </div>
@@ -448,9 +568,9 @@ export default function Landing() {
                         {features.map((feature, index) => (
                             <div
                                 key={index}
-                                className="feature-card bg-daleel-tech-slate rounded-2xl p-8 border border-daleel-cyan/20 hover:border-daleel-cyan/60 transition-colors duration-300 group border-glow-hover"
+                                className="feature-card bg-daleel-tech-slate rounded-2xl p-8 border border-daleel-cyan/20 hover:border-daleel-cyan/60 transition-all duration-300 group border-glow-hover hover-lift gradient-border"
                             >
-                                <div className="w-14 h-14 bg-daleel-gradient rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform glow-neon">
+                                <div className="feature-icon w-14 h-14 bg-daleel-gradient rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform glow-neon">
                                     <feature.icon className="w-7 h-7 text-daleel-deep-space" />
                                 </div>
                                 <h3 className="text-xl font-bold text-daleel-pure-light mb-3">{feature.title[language]}</h3>
@@ -478,18 +598,18 @@ export default function Landing() {
                     <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
                         {steps.map((step, index) => (
                             <div key={index} className="step-card relative">
-                                <div className="bg-daleel-tech-slate rounded-2xl p-8 border border-daleel-cyan/20 hover:border-daleel-neon/60 transition-colors h-full border-glow-hover">
-                                    <div className="text-6xl font-bold text-daleel-gradient mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
+                                <div className="bg-daleel-tech-slate rounded-2xl p-8 border border-daleel-cyan/20 hover:border-daleel-neon/60 transition-all h-full border-glow-hover hover-lift gradient-border">
+                                    <div className="step-number text-6xl font-bold text-daleel-gradient mb-4" style={{ fontFamily: 'Space Grotesk, sans-serif' }}>
                                         {step.number}
                                     </div>
-                                    <div className="w-12 h-12 bg-daleel-gradient rounded-xl flex items-center justify-center mb-4 glow-neon">
+                                    <div className="w-12 h-12 bg-daleel-gradient rounded-xl flex items-center justify-center mb-4 glow-neon animate-pulse-glow">
                                         <step.icon className="w-6 h-6 text-daleel-deep-space" />
                                     </div>
                                     <h3 className="text-xl font-bold text-daleel-pure-light mb-2">{step.title[language]}</h3>
                                     <p className="text-daleel-pure-light/70">{step.description[language]}</p>
                                 </div>
                                 {index < steps.length - 1 && (
-                                    <div className={`hidden lg:block absolute top-1/2 ${isRTL ? '-left-4' : '-right-4'} transform -translate-y-1/2`}>
+                                    <div className={`step-arrow hidden lg:block absolute top-1/2 ${isRTL ? '-left-4' : '-right-4'} transform -translate-y-1/2`}>
                                         <ArrowRight className="w-8 h-8 text-daleel-cyan/50" />
                                     </div>
                                 )}
@@ -518,7 +638,7 @@ export default function Landing() {
                             <div className="flex flex-col sm:flex-row gap-4 justify-center">
                                 <Link
                                     to="/signup"
-                                    className="inline-flex items-center justify-center gap-2 px-8 py-4 bg-daleel-deep-space text-daleel-neon font-semibold rounded-full hover:shadow-xl transition-all text-lg border-2 border-daleel-deep-space hover:border-daleel-tech-slate"
+                                    className="cta-button inline-flex items-center justify-center gap-2 px-8 py-4 bg-daleel-deep-space text-daleel-neon font-semibold rounded-full hover:shadow-xl transition-all text-lg border-2 border-daleel-deep-space hover:border-daleel-tech-slate hover-scale"
                                 >
                                     {t('landing.hero.cta')}
                                     <ArrowRight className="w-5 h-5" />

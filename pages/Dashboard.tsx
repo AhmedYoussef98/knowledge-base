@@ -11,6 +11,8 @@ import {
     LayoutDashboard, LogOut, BookOpen, Globe
 } from 'lucide-react';
 import logo from '../src/assets/logo.png';
+import { AnimatedBackground, BackgroundPresets } from '../animations';
+import { EASING, STAGGER } from '../animations/config/animationConfig';
 
 interface TenantWithRole extends Tenant {
     userRole: UserRole;
@@ -36,7 +38,12 @@ export default function Dashboard() {
 
     useEffect(() => {
         const loadDashboard = async () => {
+            // Wait for auth to finish loading before fetching
+            if (authLoading) return;
             if (!user) return;
+
+            // Reset loading state when starting a new fetch
+            setLoading(true);
 
             // Auto-accept any pending invites first
             await autoAcceptPendingInvites();
@@ -57,7 +64,7 @@ export default function Dashboard() {
         };
 
         loadDashboard();
-    }, [user]);
+    }, [user, authLoading]);
 
     // Animation Effect
     useEffect(() => {
@@ -69,27 +76,36 @@ export default function Dashboard() {
                     y: -20,
                     opacity: 0,
                     duration: 0.6,
-                    ease: "power2.out"
+                    ease: EASING.snappy
                 })
                     .from(".dashboard-title", {
                         x: isRTL ? 20 : -20,
                         opacity: 0,
                         duration: 0.6,
-                        ease: "power2.out"
+                        ease: EASING.snappy
                     }, "-=0.4")
                     .from(".tenant-card", {
-                        y: 30,
+                        y: 40,
                         opacity: 0,
-                        duration: 0.6,
-                        stagger: 0.1,
-                        ease: "back.out(1.5)"
+                        scale: 0.95,
+                        duration: 0.7,
+                        stagger: STAGGER.normal,
+                        ease: EASING.bounce
                     }, "-=0.2")
                     .from(".help-section", {
                         y: 20,
                         opacity: 0,
                         duration: 0.6,
-                        ease: "power2.out"
+                        ease: EASING.snappy
                     }, "-=0.4");
+
+                // Add continuous animation for "Create New" card
+                gsap.to('.create-card-icon', {
+                    rotation: 90,
+                    duration: 0.3,
+                    ease: EASING.snappy,
+                    paused: true,
+                });
 
                 hasAnimated.current = true;
             }, containerRef);
@@ -141,9 +157,16 @@ export default function Dashboard() {
     }
 
     return (
-        <div ref={containerRef} className="min-h-screen bg-daleel-deep-space circuit-pattern">
+        <div ref={containerRef} className="min-h-screen bg-daleel-deep-space circuit-pattern relative overflow-hidden">
+            {/* Animated Background */}
+            <AnimatedBackground
+                {...BackgroundPresets.minimal}
+                showMouseGlow={true}
+                className="fixed inset-0 -z-5"
+            />
+
             {/* Header */}
-            <header className="bg-daleel-tech-slate border-b border-daleel-cyan/20 sticky top-0 z-10 dashboard-header">
+            <header className="bg-daleel-tech-slate/90 backdrop-blur-sm border-b border-daleel-cyan/20 sticky top-0 z-10 dashboard-header">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
                         <div className="w-12 h-12 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon p-2">

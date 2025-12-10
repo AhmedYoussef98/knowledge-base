@@ -8,10 +8,11 @@ interface Props {
   onClose: () => void;
   onSuccess: () => void;
   existingCategories: CategoryData[];
+  tenantId: string;
   t: (key: string) => string;
 }
 
-export const AddQuestionModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, existingCategories, t }) => {
+export const AddQuestionModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, existingCategories, tenantId, t }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     question: '',
@@ -29,7 +30,7 @@ export const AddQuestionModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, 
     e.preventDefault();
     setIsSubmitting(true);
     try {
-      await addNewItem(formData);
+      await addNewItem(tenantId, formData);
       onSuccess();
       onClose();
       // Reset form
@@ -186,32 +187,32 @@ export const AddQuestionModal: React.FC<Props> = ({ isOpen, onClose, onSuccess, 
             </div>
           </div>
 
-        </form>
+          {/* Footer Actions */}
+          <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 sticky bottom-0 -mx-6 -mb-6 mt-6">
+            <button
+              type="button"
+              onClick={onClose}
+              className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition-colors"
+            >
+              {t('cancel')}
+            </button>
+            <button
+              type="submit"
+              disabled={isSubmitting}
+              className="px-5 py-2.5 rounded-lg bg-squad-primary text-white font-medium hover:bg-squad-primary/90 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-squad-primary/20"
+            >
+              {isSubmitting ? (
+                <>{t('saving')}...</>
+              ) : (
+                <>
+                  <Save className="w-4 h-4" />
+                  {t('save')}
+                </>
+              )}
+            </button>
+          </div>
 
-        {/* Footer Actions */}
-        <div className="p-6 border-t border-gray-100 bg-gray-50 flex justify-end gap-3 sticky bottom-0">
-          <button 
-            type="button" 
-            onClick={onClose}
-            className="px-5 py-2.5 rounded-lg border border-gray-300 text-gray-700 font-medium hover:bg-gray-100 transition-colors"
-          >
-            {t('cancel')}
-          </button>
-          <button 
-            onClick={handleSubmit}
-            disabled={isSubmitting}
-            className="px-5 py-2.5 rounded-lg bg-squad-primary text-white font-medium hover:bg-squad-primary/90 transition-all flex items-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed shadow-lg shadow-squad-primary/20"
-          >
-            {isSubmitting ? (
-              <>{t('saving')}...</>
-            ) : (
-              <>
-                <Save className="w-4 h-4" />
-                {t('save')}
-              </>
-            )}
-          </button>
-        </div>
+        </form>
 
       </div>
     </div>

@@ -7,6 +7,8 @@ import { useTranslation } from '../i18n/useTranslation';
 import { autoAcceptPendingInvites } from '../services/tenantApi';
 import { Mail, Lock, UserPlus, Loader2, AlertCircle, CheckCircle2, Globe } from 'lucide-react';
 import logo from '../src/assets/logo.png';
+import { AnimatedBackground, BackgroundPresets } from '../animations';
+import { EASING } from '../animations/config/animationConfig';
 
 export default function SignUp() {
     const [email, setEmail] = useState('');
@@ -30,15 +32,64 @@ export default function SignUp() {
     // Animation
     useEffect(() => {
         const ctx = gsap.context(() => {
-            gsap.from(formRef.current, {
-                y: 20,
-                opacity: 0,
-                duration: 0.6,
-                ease: "power2.out"
+            // Logo entrance
+            gsap.fromTo('.signup-logo',
+                { scale: 0, rotation: -180 },
+                { scale: 1, rotation: 0, duration: 0.8, ease: EASING.bounce }
+            );
+
+            // Title and subtitle
+            gsap.fromTo('.signup-title',
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, delay: 0.3, ease: EASING.snappy }
+            );
+
+            gsap.fromTo('.signup-subtitle',
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.6, delay: 0.4, ease: EASING.snappy }
+            );
+
+            // Form card entrance
+            gsap.fromTo('.signup-card',
+                { opacity: 0, y: 30, scale: 0.95 },
+                { opacity: 1, y: 0, scale: 1, duration: 0.8, delay: 0.5, ease: EASING.snappy }
+            );
+
+            // Form fields stagger
+            gsap.fromTo('.form-field',
+                { opacity: 0, x: isRTL ? 20 : -20 },
+                {
+                    opacity: 1,
+                    x: 0,
+                    duration: 0.5,
+                    stagger: 0.1,
+                    delay: 0.7,
+                    ease: EASING.snappy
+                }
+            );
+
+            // Submit button
+            gsap.fromTo('.submit-button',
+                { opacity: 0, y: 20 },
+                { opacity: 1, y: 0, duration: 0.5, delay: 1, ease: EASING.bounce }
+            );
+
+            // Floating orbs animation
+            gsap.to('.floating-orb', {
+                y: -30,
+                x: 20,
+                duration: 4,
+                repeat: -1,
+                yoyo: true,
+                ease: 'sine.inOut',
+                stagger: {
+                    each: 0.5,
+                    from: 'random',
+                },
             });
         }, containerRef);
         return () => ctx.revert();
-    }, []);
+    }, [isRTL]);
 
     // Get return URL from query params
     const returnTo = searchParams.get('returnTo');
@@ -212,11 +263,17 @@ export default function SignUp() {
     }
 
     return (
-        <div ref={containerRef} className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4 relative">
+        <div ref={containerRef} className="min-h-screen bg-daleel-deep-space circuit-pattern flex items-center justify-center p-4 relative overflow-hidden">
+            {/* Animated Background */}
+            <AnimatedBackground
+                {...BackgroundPresets.auth}
+                className="absolute inset-0 -z-5"
+            />
+
             {/* Background gradient overlays */}
             <div className="absolute inset-0 bg-gradient-to-br from-daleel-cyan/5 via-daleel-deep-space to-daleel-neon/5 -z-10" />
-            <div className="absolute top-20 left-10 w-96 h-96 bg-daleel-neon/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
-            <div className="absolute bottom-20 right-10 w-96 h-96 bg-daleel-cyan/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
+            <div className="floating-orb absolute top-20 left-10 w-96 h-96 bg-daleel-neon/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30" />
+            <div className="floating-orb absolute bottom-20 right-10 w-96 h-96 bg-daleel-cyan/5 rounded-full mix-blend-multiply filter blur-3xl opacity-30" />
 
             <div className="w-full max-w-md relative z-10">
                 {/* Language Toggle - Top Right */}
@@ -233,14 +290,14 @@ export default function SignUp() {
                 {/* Logo/Brand */}
                 <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
                     <Link to="/" className="inline-block">
-                        <div className="inline-flex items-center justify-center w-24 h-24 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-6 glow-neon p-3">
+                        <div className="signup-logo inline-flex items-center justify-center w-24 h-24 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-6 glow-neon p-3 hover-scale">
                             <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                     </Link>
-                    <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                    <h1 className="signup-title text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                         {t('auth.signupTitle')}
                     </h1>
-                    <p className="text-daleel-pure-light/70 mt-2">
+                    <p className="signup-subtitle text-daleel-pure-light/70 mt-2">
                         {returnTo?.includes('invite')
                             ? (language === 'ar' ? 'سجّل لقبول دعوتك' : 'Sign up to accept your invitation')
                             : t('auth.signupSubtitle')
@@ -249,10 +306,10 @@ export default function SignUp() {
                 </div>
 
                 {/* Form Card */}
-                <div ref={formRef} className="bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-cyan/20 p-8 glow-cyan">
+                <div ref={formRef} className="signup-card bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-cyan/20 p-8 glow-cyan gradient-border">
                     <form onSubmit={handleSubmit} className="space-y-5">
                         {/* Email */}
-                        <div>
+                        <div className="form-field">
                             <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                                 {t('auth.email')}
                             </label>
@@ -262,7 +319,7 @@ export default function SignUp() {
                                     type="email"
                                     value={email}
                                     onChange={(e) => setEmail(e.target.value)}
-                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40 focus:glow-neon`}
                                     placeholder="you@company.com"
                                     required
                                     dir={isRTL ? 'rtl' : 'ltr'}
@@ -271,7 +328,7 @@ export default function SignUp() {
                         </div>
 
                         {/* Password */}
-                        <div>
+                        <div className="form-field">
                             <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                                 {t('auth.password')}
                             </label>
@@ -281,7 +338,7 @@ export default function SignUp() {
                                     type="password"
                                     value={password}
                                     onChange={(e) => setPassword(e.target.value)}
-                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40 focus:glow-neon`}
                                     placeholder="••••••••"
                                     required
                                 />
@@ -289,7 +346,7 @@ export default function SignUp() {
                         </div>
 
                         {/* Confirm Password */}
-                        <div>
+                        <div className="form-field">
                             <label className={`block text-sm font-medium text-daleel-pure-light mb-2 ${isRTL ? 'text-right' : 'text-left'}`}>
                                 {t('auth.confirmPassword')}
                             </label>
@@ -299,7 +356,7 @@ export default function SignUp() {
                                     type="password"
                                     value={confirmPassword}
                                     onChange={(e) => setConfirmPassword(e.target.value)}
-                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40`}
+                                    className={`w-full ${isRTL ? 'pr-11 pl-4' : 'pl-11 pr-4'} py-3 border border-daleel-cyan/30 rounded-xl focus:ring-2 focus:ring-daleel-neon focus:border-transparent transition-all bg-daleel-deep-space text-daleel-pure-light placeholder:text-daleel-pure-light/40 focus:glow-neon`}
                                     placeholder="••••••••"
                                     required
                                 />
@@ -308,7 +365,7 @@ export default function SignUp() {
 
                         {/* Error Message */}
                         {error && (
-                            <div className={`flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
+                            <div className={`animate-shake flex items-center gap-2 p-3 bg-red-500/10 border border-red-500/30 rounded-xl text-red-400 text-sm ${isRTL ? 'flex-row-reverse text-right' : ''}`}>
                                 <AlertCircle className="w-5 h-5 flex-shrink-0" />
                                 <span>{error}</span>
                             </div>
@@ -318,7 +375,7 @@ export default function SignUp() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full py-3 bg-daleel-neon text-daleel-deep-space font-semibold rounded-xl hover:bg-daleel-green transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 glow-neon"
+                            className="submit-button w-full py-3 bg-daleel-neon text-daleel-deep-space font-semibold rounded-xl hover:bg-daleel-green transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 glow-neon hover-scale hover-glow-intense"
                         >
                             {loading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />

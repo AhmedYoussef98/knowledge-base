@@ -1,5 +1,7 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useParams, Link } from 'react-router-dom';
+import { gsap } from 'gsap';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { Navbar } from '../components/Navbar';
 import { KnowledgeCard } from '../components/KnowledgeCard';
 import { AnalyticsDashboard } from '../components/AnalyticsDashboard';
@@ -13,6 +15,10 @@ import { useAuth } from '../contexts/AuthContext';
 import { KnowledgeItem, CategoryData, AnalyticsData, SearchLog, SortOption } from '../types';
 import { Search, Filter, SortAsc, History, BarChart2, Loader2, AlertCircle } from 'lucide-react';
 import logo from '../src/assets/logo.png';
+import { AnimatedBackground, BackgroundPresets } from '../animations';
+import { EASING, STAGGER } from '../animations/config/animationConfig';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Home() {
     // Get tenant slug from URL
@@ -189,7 +195,15 @@ export default function Home() {
     }
 
     return (
-        <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex flex-col">
+        <div className="min-h-screen bg-daleel-deep-space circuit-pattern flex flex-col relative overflow-hidden">
+            {/* Animated Background */}
+            <AnimatedBackground
+                {...BackgroundPresets.minimal}
+                showMouseGlow={true}
+                primaryColor={primaryColor}
+                className="fixed inset-0 -z-5"
+            />
+
             <Navbar
                 tenantName={tenant?.name}
                 primaryColor={primaryColor}
