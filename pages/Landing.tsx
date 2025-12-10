@@ -255,9 +255,9 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                     <div className="flex items-center justify-between h-16">
                         <div className="flex items-center gap-3">
-                            <img src={logo} alt="Daleel Logo" className="w-10 h-10 object-contain" />
+                            <img src={logo} alt="Daleel Logo" className="w-14 h-14 object-contain" />
                             <div>
-                                <p className="text-xs text-daleel-cyan">{t('brand.tagline')}</p>
+                                <p className="text-sm text-daleel-cyan font-medium">{t('brand.tagline')}</p>
                             </div>
                         </div>
                         <div className="flex items-center gap-4">
@@ -306,32 +306,45 @@ export default function Landing() {
                 <div className="absolute bottom-20 left-1/2 w-72 h-72 bg-daleel-green/10 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse" />
 
                 <div className="max-w-7xl mx-auto">
-                    <div className="grid lg:grid-cols-2 gap-12 items-center">
-                        {/* Left content */}
-                        <div className={`${isRTL ? 'text-right' : 'text-left'} max-w-4xl mx-auto hero-content`}>
-                            <h1 className="hero-title text-5xl sm:text-6xl lg:text-7xl font-bold text-daleel-pure-light leading-tight mb-6" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
+                    {/* Centered Hero with Logo */}
+                    <div className="text-center mb-16">
+                        <div className="hero-content">
+                            {/* Logo as Hero */}
+                            <div className="hero-title flex justify-center mb-8">
+                                <div className="relative">
+                                    <div className="absolute inset-0 bg-daleel-gradient blur-3xl opacity-20 animate-pulse"></div>
+                                    <img
+                                        src={logo}
+                                        alt="Daleel Logo"
+                                        className="relative w-64 sm:w-80 lg:w-96 h-auto object-contain drop-shadow-2xl"
+                                    />
+                                </div>
+                            </div>
+
+                            <h2 className="hero-subtitle text-3xl sm:text-4xl lg:text-5xl font-bold text-daleel-pure-light mb-6 max-w-4xl mx-auto leading-tight" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                                 {language === 'ar' ? (
                                     <>
-                                        دليلك الذكي
-                                        <span className="block text-daleel-gradient">
-                                            نحو الوضوح
-                                        </span>
+                                        <span className="text-daleel-gradient">الحل الذكي</span> لقاعدة المعرفة
+                                        <br />
+                                        ودعم العملاء
                                     </>
                                 ) : (
                                     <>
-                                        Your AI Path
-                                        <span className="block text-daleel-gradient">
-                                            to Clarity
-                                        </span>
+                                        AI-Powered <span className="text-daleel-gradient">Knowledge Base</span>
+                                        <br />
+                                        for Smart Customer Support
                                     </>
                                 )}
-                            </h1>
+                            </h2>
 
-                            <p className="hero-subtitle text-xl text-daleel-pure-light/80 mb-8 max-w-lg">
-                                {t('landing.hero.subtitle')}
+                            <p className="text-xl text-daleel-pure-light/80 mb-10 max-w-2xl mx-auto">
+                                {language === 'ar'
+                                    ? 'منصة ذكية تساعد عملاءك على إيجاد الإجابات فوراً، وتقلل تذاكر الدعم بنسبة تصل إلى 50٪'
+                                    : 'Empower your customers to find answers instantly with AI, and reduce support tickets by up to 50%'
+                                }
                             </p>
 
-                            <div className={`hero-buttons flex flex-col sm:flex-row gap-4 ${isRTL ? 'justify-end' : 'justify-start'} mb-12`}>
+                            <div className="hero-buttons flex flex-col sm:flex-row gap-4 justify-center mb-12">
                                 <Link
                                     to="/signup"
                                     className="group inline-flex items-center justify-center gap-2 px-8 py-4 bg-daleel-neon text-daleel-deep-space font-semibold rounded-full glow-neon-lg hover:bg-daleel-green transition-all text-lg"
@@ -347,27 +360,28 @@ export default function Landing() {
                                 </Link>
                             </div>
 
-                            <div className={`hero-stats flex items-center ${isRTL ? 'justify-end' : 'justify-start'} gap-8`}>
-                                <div>
+                            <div className="hero-stats flex items-center justify-center gap-8 flex-wrap">
+                                <div className="text-center">
                                     <div className="text-3xl font-bold text-daleel-neon">5 {language === 'ar' ? 'دقائق' : 'min'}</div>
                                     <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'وقت الإعداد' : 'Setup Time'}</div>
                                 </div>
                                 <div className="w-px h-12 bg-daleel-cyan/30" />
-                                <div>
+                                <div className="text-center">
                                     <div className="text-3xl font-bold text-daleel-cyan">100%</div>
                                     <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'خدمة ذاتية' : 'Self-Service'}</div>
                                 </div>
                                 <div className="w-px h-12 bg-daleel-cyan/30" />
-                                <div>
+                                <div className="text-center">
                                     <div className="text-3xl font-bold text-daleel-green">{language === 'ar' ? 'مجاني' : 'Free'}</div>
                                     <div className="text-sm text-daleel-pure-light/60">{language === 'ar' ? 'للبدء' : 'To Start'}</div>
                                 </div>
                             </div>
                         </div>
+                    </div>
 
-                        {/* Right visual */}
-                        <div className={`hero-visual relative ${isRTL ? 'lg:pr-8' : 'lg:pl-8'}`}>
-                            <div className="relative">
+                    {/* AI Demo Visual - Centered Below Hero */}
+                    <div className="hero-visual relative mt-16 max-w-2xl mx-auto">
+                        <div className="relative">
                                 {/* Main card */}
                                 <div className="floating-card bg-daleel-tech-slate rounded-2xl shadow-2xl p-6 border border-daleel-cyan/30 glow-cyan">
                                     <div className="flex items-center gap-3 mb-4">
@@ -414,7 +428,6 @@ export default function Landing() {
                             </div>
                         </div>
                     </div>
-                </div>
             </section>
 
             {/* Features Section */}
@@ -535,9 +548,9 @@ export default function Landing() {
                 <div className="max-w-7xl mx-auto">
                     <div className="flex flex-col md:flex-row items-center justify-between gap-6">
                         <div className="flex items-center gap-3">
-                            <img src={logo} alt="Daleel Logo" className="w-10 h-10 object-contain" />
+                            <img src={logo} alt="Daleel Logo" className="w-16 h-16 object-contain" />
                             <div>
-                                <p className="text-xs text-daleel-cyan">{t('brand.tagline')}</p>
+                                <p className="text-sm text-daleel-cyan font-medium">{t('brand.tagline')}</p>
                             </div>
                         </div>
                         <div className="text-center md:text-right text-daleel-pure-light/60">

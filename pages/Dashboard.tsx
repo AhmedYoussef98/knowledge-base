@@ -146,12 +146,11 @@ export default function Dashboard() {
             <header className="bg-daleel-tech-slate border-b border-daleel-cyan/20 sticky top-0 z-10 dashboard-header">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon p-1">
+                        <div className="w-12 h-12 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon p-2">
                             <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                         <div>
-                            <h1 className="font-bold text-daleel-pure-light">{t('brand.name')}</h1>
-                            <p className="text-sm text-daleel-cyan">{t('dashboard.title')}</p>
+                            <p className="text-sm text-daleel-cyan font-medium">{t('dashboard.title')}</p>
                         </div>
                     </div>
                     <div className="flex items-center gap-4">

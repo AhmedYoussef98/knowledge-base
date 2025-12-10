@@ -85,7 +85,7 @@ export default function Login() {
                 {/* Logo/Brand */}
                 <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
                     <Link to="/" className="inline-block">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-4 glow-neon p-2">
+                        <div className="inline-flex items-center justify-center w-24 h-24 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-6 glow-neon p-3">
                             <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                     </Link>

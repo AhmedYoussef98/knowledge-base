@@ -316,7 +316,7 @@ export default function Home() {
                             ))
                         ) : (
                             <div className="text-center py-16 bg-daleel-tech-slate rounded-2xl border border-daleel-cyan/30 border-dashed">
-                                <div className="bg-daleel-neon/20 border-2 border-daleel-neon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 glow-neon p-2">
+                                <div className="bg-daleel-neon/20 border-2 border-daleel-neon w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-4 glow-neon p-3">
                                     <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                                 </div>
                                 <h3 className="text-lg font-medium text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>

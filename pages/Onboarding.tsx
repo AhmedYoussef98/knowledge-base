@@ -168,7 +168,7 @@ export default function Onboarding() {
 
                 {/* Header */}
                 <div className={`text-center mb-8 ${isRTL ? 'text-right' : ''}`}>
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-gradient rounded-2xl shadow-lg mb-4 glow-neon p-2">
+                    <div className="inline-flex items-center justify-center w-24 h-24 bg-daleel-gradient rounded-2xl shadow-lg mb-6 glow-neon p-3">
                         <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>

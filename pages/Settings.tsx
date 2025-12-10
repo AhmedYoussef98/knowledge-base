@@ -217,10 +217,10 @@ export default function Settings() {
                 <div className="max-w-4xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className={`flex items-center gap-3 ${isRTL ? 'flex-row-reverse' : ''}`}>
                         <div
-                            className="w-10 h-10 rounded-xl flex items-center justify-center text-daleel-deep-space font-bold border-2 glow-neon"
+                            className="w-12 h-12 rounded-xl flex items-center justify-center text-daleel-deep-space font-bold border-2 glow-neon p-1"
                             style={{ backgroundColor: primaryColor, borderColor: primaryColor }}
                         >
-                            {name ? name.charAt(0).toUpperCase() : <img src={logo} alt="Logo" className="w-5 h-5 object-contain" />}
+                            {name ? name.charAt(0).toUpperCase() : <img src={logo} alt="Logo" className="w-full h-full object-contain" />}
                         </div>
                         <div className={isRTL ? 'text-right' : ''}>
                             <h1 className="font-bold text-daleel-pure-light">{name}</h1>
