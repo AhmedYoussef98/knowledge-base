@@ -258,9 +258,6 @@ export default function Landing() {
                         <div className="flex items-center gap-3">
                             <img src={logo} alt="Daleel Logo" className="w-10 h-10 object-contain" />
                             <div>
-                                <span className="text-xl font-bold text-daleel-pure-light">
-                                    {language === 'ar' ? 'دليل' : 'Daleel'}
-                                </span>
                                 <p className="text-xs text-daleel-cyan">{t('brand.tagline')}</p>
                             </div>
                         </div>
@@ -313,11 +310,6 @@ export default function Landing() {
                     <div className="grid lg:grid-cols-2 gap-12 items-center">
                         {/* Left content */}
                         <div className={`${isRTL ? 'text-right' : 'text-left'} max-w-4xl mx-auto hero-content`}>
-                            <div className="hero-badge inline-flex items-center px-4 py-2 rounded-full bg-daleel-tech-slate border border-daleel-cyan/30 mb-8">
-                                <Zap className="w-4 h-4 text-daleel-neon mr-2" />
-                                <span className="text-sm font-semibold text-daleel-pure-light">{t('landing.hero.title')}</span>
-                            </div>
-
                             <h1 className="hero-title text-5xl sm:text-6xl lg:text-7xl font-bold text-daleel-pure-light leading-tight mb-6" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                                 {language === 'ar' ? (
                                     <>
@@ -546,9 +538,6 @@ export default function Landing() {
                         <div className="flex items-center gap-3">
                             <img src={logo} alt="Daleel Logo" className="w-10 h-10 object-contain" />
                             <div>
-                                <span className="text-xl font-bold text-daleel-pure-light">
-                                    {language === 'ar' ? 'دليل' : 'Daleel'}
-                                </span>
                                 <p className="text-xs text-daleel-cyan">{t('brand.tagline')}</p>
                             </div>
                         </div>

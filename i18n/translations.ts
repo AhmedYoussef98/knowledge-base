@@ -529,6 +529,86 @@ export const translations = {
       en: 'Unique Users',
       ar: 'المستخدمون الفريدون'
     }
+  },
+
+  // Gemini Guide Page
+  geminiGuide: {
+    title: {
+      en: 'Gemini Setup Guide',
+      ar: 'دليل إعداد Gemini'
+    },
+    titleHighlight: {
+      en: 'Get Your API Key',
+      ar: 'احصل على مفتاح API'
+    },
+    subtitle: {
+      en: 'Follow these simple steps to get your Google Gemini API key and power your AI assistant.',
+      ar: 'اتبع هذه الخطوات البسيطة للحصول على مفتاح Google Gemini API وتشغيل مساعدك الذكي.'
+    },
+    back: {
+      en: 'Back to Dashboard',
+      ar: 'العودة للوحة التحكم'
+    },
+    freeAccess: {
+      en: 'Free Access',
+      ar: 'وصول مجاني'
+    },
+    steps: {
+      step1: {
+        title: {
+          en: 'Visit Google AI Studio',
+          ar: 'زيارة استوديو Google AI'
+        },
+        description: {
+          en: 'Go to Google\'s official AI Studio platform. This is where you manage your Gemini API access.',
+          ar: 'انتقل إلى منصة Google AI Studio الرسمية. هنا يمكنك إدارة وصولك إلى Gemini API.'
+        },
+        action: {
+          en: 'Open Google AI Studio',
+          ar: 'فتح Google AI Studio'
+        }
+      },
+      step2: {
+        title: {
+          en: 'Sign in with Google',
+          ar: 'تسجيل الدخول باستخدام Google'
+        },
+        description: {
+          en: 'Log in using your existing Google account. If you don\'t have one, you can create it for free.',
+          ar: 'سجل الدخول باستخدام حساب Google الخاص بك. إذا لم يكن لديك حساب، يمكنك إنشاؤه مجانًا.'
+        }
+      },
+      step3: {
+        title: {
+          en: 'Get API Key',
+          ar: 'احصل على مفتاح API'
+        },
+        description: {
+          en: 'Click on "Get API key" button in the top left corner, then click "Create API key in new project".',
+          ar: 'انقر على زر "Get API key" في الزاوية اليسرى العليا، ثم انقر على "Create API key in new project".'
+        }
+      },
+      step4: {
+        title: {
+          en: 'Copy & Paste',
+          ar: 'نسخ ولصق'
+        },
+        description: {
+          en: 'Copy your new API key and paste it into the "Gemini API Key" field in your knowledge base settings.',
+          ar: 'انسخ مفتاح API الجديد والصقه في حقل "Gemini API Key" في إعدادات قاعدتك المعرفية.'
+        }
+      }
+    },
+    bottomCta: {
+      text: {
+        en: 'Got your key? Great! Let\'s set it up.',
+        ar: 'حصلت على المفتاح؟ رائع! دعنا نقم بإعداده.'
+      },
+      button: {
+        en: 'I Have My Key',
+        ar: 'لدي المفتاح الآن'
+      }
+    }
   }
 };
 

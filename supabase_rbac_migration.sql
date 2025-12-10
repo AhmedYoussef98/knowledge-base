@@ -160,5 +160,41 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================
--- DONE! The recursion issue should now be fixed.
+-- 10. RLS POLICIES FOR TENANTS
 -- ============================================
+
+-- Enable RLS on tenants if not already enabled
+ALTER TABLE tenants ENABLE ROW LEVEL SECURITY;
+
+-- Owner can see their own tenants
+CREATE POLICY "Tenants: owner select" ON tenants
+  FOR SELECT
+  USING (owner_id = auth.uid());
+
+-- Members can see tenants they are part of
+-- Note: usage involves recursion via tenant_members -> tenants, so ensure helper functions are used if complex logic needed.
+-- But standard join access is usually handled by app logic. For direct RLS:
+CREATE POLICY "Tenants: member select" ON tenants
+  FOR SELECT
+  USING (
+    EXISTS (
+      SELECT 1 FROM tenant_members 
+      WHERE tenant_id = tenants.id 
+      AND user_id = auth.uid()
+    )
+  );
+
+-- Owner can insert/update/delete their own tenants
+CREATE POLICY "Tenants: owner insert" ON tenants
+  FOR INSERT
+  WITH CHECK (owner_id = auth.uid());
+
+CREATE POLICY "Tenants: owner update" ON tenants
+  FOR UPDATE
+  USING (owner_id = auth.uid())
+  WITH CHECK (owner_id = auth.uid());
+
+CREATE POLICY "Tenants: owner delete" ON tenants
+  FOR DELETE
+  USING (owner_id = auth.uid());
+

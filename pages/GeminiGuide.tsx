@@ -1,14 +1,16 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../i18n/useTranslation';
 import {
     ArrowLeft, ExternalLink, Copy, Check, Key,
-    ShieldCheck, Sparkles, ChevronRight, Laptop
+    ShieldCheck, Sparkles, ChevronRight, Laptop, Globe
 } from 'lucide-react';
 
 export default function GeminiGuide() {
     const { t } = useTranslation();
+    const { language, toggleLanguage } = useLanguage();
     const headerRef = useRef<HTMLDivElement>(null);
     const stepsRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -102,6 +104,14 @@ export default function GeminiGuide() {
                         <ArrowLeft className="w-5 h-5" />
                     </div>
                     <span className="font-medium">{t('geminiGuide.back')}</span>
+                </button>
+
+                <button
+                    onClick={toggleLanguage}
+                    className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/50 hover:bg-white transition-all text-sm border border-slate-200 hover:border-slate-300 text-slate-700 font-medium"
+                >
+                    <Globe size={14} />
+                    <span>{language === 'ar' ? 'English' : 'العربية'}</span>
                 </button>
             </nav>
 

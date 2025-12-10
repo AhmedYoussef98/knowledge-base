@@ -307,14 +307,12 @@ export default function Dashboard() {
                                     : 'Check out our documentation or contact support for assistance.'}
                             </p>
                         </div>
-                        <a
-                            href="https://docs.example.com"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <Link
+                            to="/gemini-guide"
                             className="px-6 py-3 bg-daleel-deep-space text-daleel-neon font-semibold rounded-xl hover:shadow-xl transition-all whitespace-nowrap border-2 border-daleel-deep-space"
                         >
                             {language === 'ar' ? 'عرض الوثائق' : 'View Documentation'}
-                        </a>
+                        </Link>
                     </div>
                 </div>
             </main>
