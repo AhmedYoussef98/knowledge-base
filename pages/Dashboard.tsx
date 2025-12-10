@@ -37,13 +37,12 @@ export default function Dashboard() {
     }, [user, authLoading, navigate]);
 
     useEffect(() => {
+        let isMounted = true;
+
         const loadDashboard = async () => {
             // Wait for auth to finish loading before fetching
             if (authLoading) return;
-            if (!user) return;
-
-            // Reset loading state when starting a new fetch
-            setLoading(true);
+            if (!user?.id) return;
 
             // Auto-accept any pending invites first
             await autoAcceptPendingInvites();
@@ -59,60 +58,62 @@ export default function Dashboard() {
                 })
             );
 
-            setTenants(tenantsWithRoles);
-            setLoading(false);
+            if (isMounted) {
+                setTenants(tenantsWithRoles);
+                setLoading(false);
+            }
         };
 
         loadDashboard();
-    }, [user, authLoading]);
 
-    // Animation Effect
+        return () => {
+            isMounted = false;
+        };
+    }, [user?.id, authLoading]);
+
+    // Animation Effect - runs once when content loads
     useEffect(() => {
-        if (!loading && tenants.length > 0 && !hasAnimated.current && containerRef.current) {
-            const ctx = gsap.context(() => {
-                const tl = gsap.timeline();
+        if (!loading && !hasAnimated.current && containerRef.current) {
+            hasAnimated.current = true;
 
-                tl.from(".dashboard-header", {
-                    y: -20,
-                    opacity: 0,
-                    duration: 0.6,
-                    ease: EASING.snappy
-                })
-                    .from(".dashboard-title", {
-                        x: isRTL ? 20 : -20,
-                        opacity: 0,
-                        duration: 0.6,
-                        ease: EASING.snappy
-                    }, "-=0.4")
-                    .from(".tenant-card", {
-                        y: 40,
-                        opacity: 0,
-                        scale: 0.95,
-                        duration: 0.7,
-                        stagger: STAGGER.normal,
-                        ease: EASING.bounce
-                    }, "-=0.2")
-                    .from(".help-section", {
-                        y: 20,
-                        opacity: 0,
-                        duration: 0.6,
-                        ease: EASING.snappy
-                    }, "-=0.4");
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    // Clear GSAP inline styles after animation to prevent visibility issues
+                    gsap.set(".dashboard-header, .dashboard-title, .tenant-card, .help-section", {
+                        clearProps: "all"
+                    });
+                }
+            });
 
-                // Add continuous animation for "Create New" card
-                gsap.to('.create-card-icon', {
-                    rotation: 90,
-                    duration: 0.3,
-                    ease: EASING.snappy,
-                    paused: true,
-                });
-
-                hasAnimated.current = true;
-            }, containerRef);
-
-            return () => ctx.revert();
+            tl.from(".dashboard-header", {
+                y: -20,
+                opacity: 0,
+                duration: 0.6,
+                ease: EASING.snappy
+            })
+            .from(".dashboard-title", {
+                x: isRTL ? 20 : -20,
+                opacity: 0,
+                duration: 0.6,
+                ease: EASING.snappy
+            }, "-=0.4")
+            .from(".tenant-card", {
+                y: 40,
+                opacity: 0,
+                scale: 0.95,
+                duration: 0.7,
+                stagger: STAGGER.normal,
+                ease: EASING.bounce
+            }, "-=0.2")
+            .from(".help-section", {
+                y: 20,
+                opacity: 0,
+                duration: 0.6,
+                ease: EASING.snappy
+            }, "-=0.4");
         }
-    }, [loading, tenants, isRTL]);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [loading]);
 
     const handleSignOut = async () => {
         await signOut();
