@@ -187,7 +187,7 @@ export const QuestionModal: React.FC<Props> = ({
                                 <input
                                     required
                                     type="text"
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-10 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                     placeholder="Ex: How can I track my shipment?"
                                     value={formData.question}
                                     onChange={e => setFormData({ ...formData, question: e.target.value })}
@@ -200,7 +200,7 @@ export const QuestionModal: React.FC<Props> = ({
                             <textarea
                                 required
                                 rows={5}
-                                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                                className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                                 placeholder="Write the detailed answer here..."
                                 value={formData.answer}
                                 onChange={e => setFormData({ ...formData, answer: e.target.value })}
@@ -218,7 +218,7 @@ export const QuestionModal: React.FC<Props> = ({
                                     type="text"
                                     list="categories"
                                     required
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-10 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Select or type new"
                                     value={formData.category}
                                     onChange={e => setFormData({ ...formData, category: e.target.value })}
@@ -239,7 +239,7 @@ export const QuestionModal: React.FC<Props> = ({
                                 <input
                                     type="text"
                                     required
-                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-10 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 pl-10 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="Ex: Delivery, Payments..."
                                     value={formData.subcategory}
                                     onChange={e => setFormData({ ...formData, subcategory: e.target.value })}
@@ -253,7 +253,7 @@ export const QuestionModal: React.FC<Props> = ({
                         <label className="block text-sm font-medium text-gray-700 mb-1">Keywords</label>
                         <input
                             type="text"
-                            className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full bg-gray-50 border border-gray-200 rounded-lg p-3 text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                             placeholder="Ex: track, shipment (space separated)"
                             value={formData.keywords}
                             onChange={e => setFormData({ ...formData, keywords: e.target.value })}
@@ -273,7 +273,7 @@ export const QuestionModal: React.FC<Props> = ({
                                 <ImageIcon className="absolute top-2.5 left-3 text-gray-400 w-4 h-4" />
                                 <input
                                     type="url"
-                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 pl-9 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 pl-9 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="https://example.com/image.jpg"
                                     value={formData.image}
                                     onChange={e => setFormData({ ...formData, image: e.target.value })}
@@ -287,7 +287,7 @@ export const QuestionModal: React.FC<Props> = ({
                                 <Video className="absolute top-2.5 left-3 text-gray-400 w-4 h-4" />
                                 <input
                                     type="url"
-                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 pl-9 text-sm focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                                    className="w-full bg-white border border-gray-200 rounded-lg p-2 pl-9 text-sm text-gray-900 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                                     placeholder="https://youtube.com/watch?v=..."
                                     value={formData.video}
                                     onChange={e => setFormData({ ...formData, video: e.target.value })}

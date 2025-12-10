@@ -1,12 +1,14 @@
 import React, { useEffect, useRef } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { gsap } from 'gsap';
+import { useTranslation } from '../i18n/useTranslation';
 import {
     ArrowLeft, ExternalLink, Copy, Check, Key,
     ShieldCheck, Sparkles, ChevronRight, Laptop
 } from 'lucide-react';
 
 export default function GeminiGuide() {
+    const { t } = useTranslation();
     const headerRef = useRef<HTMLDivElement>(null);
     const stepsRef = useRef<HTMLDivElement>(null);
     const containerRef = useRef<HTMLDivElement>(null);
@@ -55,27 +57,27 @@ export default function GeminiGuide() {
 
     const steps = [
         {
-            title: "Visit Google AI Studio",
-            description: "Go to Google's official AI Studio platform. This is where you manage your Gemini API access.",
+            title: t('geminiGuide.steps.step1.title'),
+            description: t('geminiGuide.steps.step1.description'),
             action: {
-                label: "Open Google AI Studio",
+                label: t('geminiGuide.steps.step1.action'),
                 url: "https://aistudio.google.com/app/apikey"
             },
             icon: <Laptop className="w-6 h-6 text-blue-600" />
         },
         {
-            title: "Sign in with Google",
-            description: "Log in using your standard Google account. No special developer account is required.",
+            title: t('geminiGuide.steps.step2.title'),
+            description: t('geminiGuide.steps.step2.description'),
             icon: <ShieldCheck className="w-6 h-6 text-emerald-600" />
         },
         {
-            title: "Create API Key",
-            description: "Click the blue 'Create API key' button. Select a project or let it create a new one automatically.",
+            title: t('geminiGuide.steps.step3.title'),
+            description: t('geminiGuide.steps.step3.description'),
             icon: <Key className="w-6 h-6 text-amber-600" />
         },
         {
-            title: "Copy & Paste",
-            description: "Copy your new key (starts with AIza...) and paste it back here in the settings.",
+            title: t('geminiGuide.steps.step4.title'),
+            description: t('geminiGuide.steps.step4.description'),
             icon: <Copy className="w-6 h-6 text-slate-600" />
         }
     ];
@@ -99,7 +101,7 @@ export default function GeminiGuide() {
                     <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center shadow-sm group-hover:scale-105 transition-transform">
                         <ArrowLeft className="w-5 h-5" />
                     </div>
-                    <span className="font-medium">Back</span>
+                    <span className="font-medium">{t('geminiGuide.back')}</span>
                 </button>
             </nav>
 
@@ -109,14 +111,14 @@ export default function GeminiGuide() {
                 <div ref={headerRef} className="text-center mb-16 max-w-3xl mx-auto">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-full shadow-sm mb-6">
                         <Sparkles className="w-4 h-4 text-amber-500" />
-                        <span className="text-sm font-semibold text-slate-700">Free Access</span>
+                        <span className="text-sm font-semibold text-slate-700">{t('geminiGuide.freeAccess')}</span>
                     </div>
                     <h1 className="text-4xl md:text-5xl font-bold text-slate-900 mb-6 tracking-tight leading-tight">
-                        Unlock Intelligence with <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600">Gemini API</span>
+                        {t('geminiGuide.title')} <br />
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-emerald-600">{t('geminiGuide.titleHighlight')}</span>
                     </h1>
                     <p className="text-lg text-slate-600 leading-relaxed max-w-2xl mx-auto">
-                        Get your free API key from Google in less than 2 minutes. No credit card required for the free tier.
+                        {t('geminiGuide.subtitle')}
                     </p>
                 </div>
 
@@ -161,13 +163,13 @@ export default function GeminiGuide() {
 
                 {/* Bottom CTA */}
                 <div className="text-center mt-16 step-card">
-                    <p className="text-slate-500 mb-6">Once you have your key, copy it and return to the previous page.</p>
+                    <p className="text-slate-500 mb-6">{t('geminiGuide.bottomCta.text')}</p>
                     <button
                         onClick={() => navigate(-1)}
                         className="px-8 py-4 bg-slate-900 text-white font-bold rounded-xl shadow-lg hover:bg-slate-800 hover:shadow-xl hover:-translate-y-1 transition-all flex items-center gap-3 mx-auto"
                     >
                         <Check className="w-5 h-5" />
-                        I Have My Key
+                        {t('geminiGuide.bottomCta.button')}
                     </button>
                 </div>
 
