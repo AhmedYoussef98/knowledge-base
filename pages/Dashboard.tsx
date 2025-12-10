@@ -47,13 +47,13 @@ export default function Dashboard() {
             // Auto-accept any pending invites first
             await autoAcceptPendingInvites();
 
-            // Then fetch all tenants
-            const allTenants = await getMyTenants();
+            // Then fetch all tenants - pass user.id to avoid auth race condition
+            const allTenants = await getMyTenants(user.id);
 
-            // Get role for each tenant
+            // Get role for each tenant - pass user.id to avoid auth race condition
             const tenantsWithRoles: TenantWithRole[] = await Promise.all(
                 allTenants.map(async (t) => {
-                    const role = await getUserTenantRole(t.id);
+                    const role = await getUserTenantRole(t.id, user.id);
                     return { ...t, userRole: role };
                 })
             );

@@ -88,23 +88,30 @@ export const getMyTenant = async (): Promise<Tenant | null> => {
 
 /**
  * Get all tenants where user is a member (or owner)
+ * @param userId - Optional user ID. If not provided, will fetch from auth (may fail on initial load)
  */
-export const getMyTenants = async (): Promise<Tenant[]> => {
-    const { data: { user } } = await supabase.auth.getUser();
+export const getMyTenants = async (userId?: string): Promise<Tenant[]> => {
+    let uid = userId;
 
-    if (!user) return [];
+    // If no userId provided, try to get from auth
+    if (!uid) {
+        const { data: { user } } = await supabase.auth.getUser();
+        uid = user?.id;
+    }
+
+    if (!uid) return [];
 
     // Get owned tenants
     const { data: ownedData } = await supabase
         .from('tenants')
         .select('*')
-        .eq('owner_id', user.id);
+        .eq('owner_id', uid);
 
     // Get member tenants
     const { data: memberData } = await supabase
         .from('tenant_members')
         .select('tenant_id')
-        .eq('user_id', user.id);
+        .eq('user_id', uid);
 
     if (!memberData || memberData.length === 0) {
         return (ownedData || []) as Tenant[];
@@ -135,11 +142,18 @@ export const userHasTenant = async (): Promise<boolean> => {
 
 /**
  * Get user's role for a specific tenant
+ * @param tenantId - The tenant ID to check
+ * @param userId - Optional user ID. If not provided, will fetch from auth
  */
-export const getUserTenantRole = async (tenantId: string): Promise<UserRole> => {
-    const { data: { user } } = await supabase.auth.getUser();
+export const getUserTenantRole = async (tenantId: string, userId?: string): Promise<UserRole> => {
+    let uid = userId;
 
-    if (!user) return null;
+    if (!uid) {
+        const { data: { user } } = await supabase.auth.getUser();
+        uid = user?.id;
+    }
+
+    if (!uid) return null;
 
     // Check if owner
     const { data: tenant } = await supabase
@@ -148,7 +162,7 @@ export const getUserTenantRole = async (tenantId: string): Promise<UserRole> => 
         .eq('id', tenantId)
         .single();
 
-    if (tenant?.owner_id === user.id) {
+    if (tenant?.owner_id === uid) {
         return 'owner';
     }
 
@@ -157,7 +171,7 @@ export const getUserTenantRole = async (tenantId: string): Promise<UserRole> => 
         .from('tenant_members')
         .select('role')
         .eq('tenant_id', tenantId)
-        .eq('user_id', user.id)
+        .eq('user_id', uid)
         .single();
 
     if (member) {
