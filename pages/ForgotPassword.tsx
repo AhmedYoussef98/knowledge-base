@@ -3,8 +3,9 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../i18n/useTranslation';
-import { Mail, Loader2, AlertCircle, CircuitBoard, CheckCircle2, ArrowLeft, Globe } from 'lucide-react';
+import { Mail, Loader2, AlertCircle, CheckCircle2, ArrowLeft, Globe } from 'lucide-react';
 import { gsap } from 'gsap';
+import logo from '../src/assets/logo.png';
 
 export default function ForgotPassword() {
     const [email, setEmail] = useState('');
@@ -69,8 +70,8 @@ export default function ForgotPassword() {
                 {/* Logo/Brand */}
                 <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
                     <Link to="/" className="inline-block">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-cyan/20 border-2 border-daleel-cyan rounded-2xl shadow-lg mb-4 glow-cyan">
-                            <CircuitBoard className="w-8 h-8 text-daleel-cyan" />
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-cyan/20 border-2 border-daleel-cyan rounded-2xl shadow-lg mb-4 glow-cyan p-2">
+                            <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                     </Link>
                     <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>

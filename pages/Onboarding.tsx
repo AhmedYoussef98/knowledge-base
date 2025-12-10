@@ -6,8 +6,9 @@ import { useTranslation } from '../i18n/useTranslation';
 import { createTenant, generateSlug, isSlugAvailable } from '../services/tenantApi';
 import {
     BookOpen, Key, Palette, ArrowRight, ArrowLeft, Check,
-    Loader2, AlertCircle, Sparkles, CheckCircle2, X, ExternalLink, Globe, CircuitBoard
+    Loader2, AlertCircle, Sparkles, CheckCircle2, X, ExternalLink, Globe
 } from 'lucide-react';
+import logo from '../src/assets/logo.png';
 
 type Step = 1 | 2 | 3;
 
@@ -167,8 +168,8 @@ export default function Onboarding() {
 
                 {/* Header */}
                 <div className={`text-center mb-8 ${isRTL ? 'text-right' : ''}`}>
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-gradient rounded-2xl shadow-lg mb-4 glow-neon">
-                        <CircuitBoard className="w-8 h-8 text-daleel-deep-space" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-gradient rounded-2xl shadow-lg mb-4 glow-neon p-2">
+                        <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                         {language === 'ar' ? 'إنشاء قاعدة معرفية جديدة' : 'Create New Knowledge Base'}

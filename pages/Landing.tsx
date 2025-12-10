@@ -18,8 +18,7 @@ import {
     MessageSquare,
     BookOpen,
     Lightbulb,
-    LayoutDashboard,
-    CircuitBoard
+    LayoutDashboard
 } from 'lucide-react';
 import logo from '../src/assets/logo.png';
 

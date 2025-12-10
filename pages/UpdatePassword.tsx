@@ -3,8 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../i18n/useTranslation';
-import { Lock, Loader2, AlertCircle, CircuitBoard, CheckCircle2, Globe } from 'lucide-react';
+import { Lock, Loader2, AlertCircle, CheckCircle2, Globe } from 'lucide-react';
 import { gsap } from 'gsap';
+import logo from '../src/assets/logo.png';
 
 export default function UpdatePassword() {
     const [password, setPassword] = useState('');
@@ -107,8 +108,8 @@ export default function UpdatePassword() {
 
                 {/* Logo/Brand */}
                 <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
-                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-green/20 border-2 border-daleel-green rounded-2xl shadow-lg mb-4 glow-neon">
-                        <CircuitBoard className="w-8 h-8 text-daleel-green" />
+                    <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-green/20 border-2 border-daleel-green rounded-2xl shadow-lg mb-4 glow-neon p-2">
+                        <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                     </div>
                     <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                         {language === 'ar' ? 'تعيين كلمة مرور جديدة' : 'Set New Password'}

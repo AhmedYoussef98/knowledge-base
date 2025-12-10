@@ -23,8 +23,9 @@ import {
     Key, Palette, Globe, Save,
     Loader2, AlertCircle, CheckCircle2, LogOut, ExternalLink,
     Users, UserPlus, Trash2, Shield, Eye, Crown, Copy, Link as LinkIcon,
-    Clock, X, LayoutDashboard, CircuitBoard
+    Clock, X, LayoutDashboard
 } from 'lucide-react';
+import logo from '../src/assets/logo.png';
 
 export default function Settings() {
     const { user, signOut, loading: authLoading } = useAuth();
@@ -219,7 +220,7 @@ export default function Settings() {
                             className="w-10 h-10 rounded-xl flex items-center justify-center text-daleel-deep-space font-bold border-2 glow-neon"
                             style={{ backgroundColor: primaryColor, borderColor: primaryColor }}
                         >
-                            {name ? name.charAt(0).toUpperCase() : <CircuitBoard className="w-5 h-5" />}
+                            {name ? name.charAt(0).toUpperCase() : <img src={logo} alt="Logo" className="w-5 h-5 object-contain" />}
                         </div>
                         <div className={isRTL ? 'text-right' : ''}>
                             <h1 className="font-bold text-daleel-pure-light">{name}</h1>

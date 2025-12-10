@@ -8,8 +8,9 @@ import { getMyTenants, autoAcceptPendingInvites, getUserTenantRole, UserRole } f
 import { Tenant } from '../contexts/TenantContext';
 import {
     Loader2, Plus, ExternalLink, Settings, Shield, Eye, Crown,
-    CircuitBoard, LayoutDashboard, LogOut, BookOpen, Globe
+    LayoutDashboard, LogOut, BookOpen, Globe
 } from 'lucide-react';
+import logo from '../src/assets/logo.png';
 
 interface TenantWithRole extends Tenant {
     userRole: UserRole;
@@ -145,8 +146,8 @@ export default function Dashboard() {
             <header className="bg-daleel-tech-slate border-b border-daleel-cyan/20 sticky top-0 z-10 dashboard-header">
                 <div className="max-w-6xl mx-auto px-4 py-4 flex justify-between items-center">
                     <div className="flex items-center gap-3">
-                        <div className="w-10 h-10 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon">
-                            <CircuitBoard className="w-5 h-5 text-daleel-neon" />
+                        <div className="w-10 h-10 bg-daleel-neon/20 border-2 border-daleel-neon rounded-xl flex items-center justify-center glow-neon p-1">
+                            <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                         <div>
                             <h1 className="font-bold text-daleel-pure-light">{t('brand.name')}</h1>

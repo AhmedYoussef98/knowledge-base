@@ -5,7 +5,8 @@ import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { autoAcceptPendingInvites } from '../services/tenantApi';
-import { Mail, Lock, UserPlus, Loader2, AlertCircle, CircuitBoard, CheckCircle2, Globe } from 'lucide-react';
+import { Mail, Lock, UserPlus, Loader2, AlertCircle, CheckCircle2, Globe } from 'lucide-react';
+import logo from '../src/assets/logo.png';
 
 export default function SignUp() {
     const [email, setEmail] = useState('');
@@ -183,8 +184,8 @@ export default function SignUp() {
 
                 <div className="w-full max-w-md relative z-10">
                     <div className="bg-daleel-tech-slate rounded-2xl shadow-xl border border-daleel-cyan/30 p-8 text-center animate-fade-in-up glow-cyan">
-                        <div className="w-16 h-16 bg-daleel-cyan/20 border-2 border-daleel-cyan rounded-full flex items-center justify-center mx-auto mb-6 glow-cyan">
-                            <CircuitBoard className="w-8 h-8 text-daleel-cyan" />
+                        <div className="w-16 h-16 bg-daleel-cyan/20 border-2 border-daleel-cyan rounded-full flex items-center justify-center mx-auto mb-6 glow-cyan p-2">
+                            <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                         <h1 className="text-2xl font-bold text-daleel-pure-light mb-2" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                             {language === 'ar' ? 'لديك حساب بالفعل' : 'You already have an account'}
@@ -232,8 +233,8 @@ export default function SignUp() {
                 {/* Logo/Brand */}
                 <div className={`${isRTL ? 'text-right' : 'text-center'} mb-8`}>
                     <Link to="/" className="inline-block">
-                        <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-4 glow-neon">
-                            <CircuitBoard className="w-8 h-8 text-daleel-neon" />
+                        <div className="inline-flex items-center justify-center w-16 h-16 bg-daleel-neon/20 border-2 border-daleel-neon rounded-2xl shadow-lg mb-4 glow-neon p-2">
+                            <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                         </div>
                     </Link>
                     <h1 className="text-3xl font-bold text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>

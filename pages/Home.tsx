@@ -11,7 +11,8 @@ import { getTenantBySlug, getUserTenantRole, UserRole } from '../services/tenant
 import { Tenant } from '../contexts/TenantContext';
 import { useAuth } from '../contexts/AuthContext';
 import { KnowledgeItem, CategoryData, AnalyticsData, SearchLog, SortOption } from '../types';
-import { Search, Filter, SortAsc, History, BarChart2, Loader2, CircuitBoard, AlertCircle } from 'lucide-react';
+import { Search, Filter, SortAsc, History, BarChart2, Loader2, AlertCircle } from 'lucide-react';
+import logo from '../src/assets/logo.png';
 
 export default function Home() {
     // Get tenant slug from URL
@@ -315,8 +316,8 @@ export default function Home() {
                             ))
                         ) : (
                             <div className="text-center py-16 bg-daleel-tech-slate rounded-2xl border border-daleel-cyan/30 border-dashed">
-                                <div className="bg-daleel-neon/20 border-2 border-daleel-neon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 glow-neon">
-                                    <CircuitBoard className="text-daleel-neon" size={32} />
+                                <div className="bg-daleel-neon/20 border-2 border-daleel-neon w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4 glow-neon p-2">
+                                    <img src={logo} alt="Daleel Logo" className="w-full h-full object-contain" />
                                 </div>
                                 <h3 className="text-lg font-medium text-daleel-pure-light" style={{ fontFamily: 'Space Grotesk, Tajawal, sans-serif' }}>
                                     {t('kb.noResults')}
