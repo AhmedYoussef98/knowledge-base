@@ -428,6 +428,154 @@ export const translations = {
     confirmDelete: {
       en: 'Are you sure you want to delete this question?',
       ar: 'هل أنت متأكد من حذف هذا السؤال؟'
+    },
+    import: {
+      en: 'Import',
+      ar: 'استيراد'
+    },
+    export: {
+      en: 'Export',
+      ar: 'تصدير'
+    }
+  },
+
+  // Bulk Import
+  bulkImport: {
+    title: {
+      en: 'Bulk Import',
+      ar: 'استيراد جماعي'
+    },
+    uploadDescription: {
+      en: 'Upload a CSV or XLSX file to import multiple questions at once',
+      ar: 'قم بتحميل ملف CSV أو XLSX لاستيراد أسئلة متعددة دفعة واحدة'
+    },
+    previewDescription: {
+      en: 'Review and validate your data before importing',
+      ar: 'راجع وتحقق من بياناتك قبل الاستيراد'
+    },
+    importingDescription: {
+      en: 'Importing your data...',
+      ar: 'جاري استيراد البيانات...'
+    },
+    completeDescription: {
+      en: 'Import process completed',
+      ar: 'اكتملت عملية الاستيراد'
+    },
+    dragDrop: {
+      en: 'Drag and drop your file here',
+      ar: 'اسحب وأفلت ملفك هنا'
+    },
+    orBrowse: {
+      en: 'or click to browse',
+      ar: 'أو انقر للتصفح'
+    },
+    selectFile: {
+      en: 'Select File',
+      ar: 'اختر ملف'
+    },
+    supportedFormats: {
+      en: 'Supported formats: CSV, XLSX (max 10MB)',
+      ar: 'الصيغ المدعومة: CSV, XLSX (الحد الأقصى 10MB)'
+    },
+    downloadTemplate: {
+      en: 'Download Template',
+      ar: 'تحميل القالب'
+    },
+    templateDescription: {
+      en: 'Download a template file with the correct column format',
+      ar: 'قم بتحميل ملف نموذجي بتنسيق الأعمدة الصحيح'
+    },
+    parsing: {
+      en: 'Parsing file...',
+      ar: 'جاري تحليل الملف...'
+    },
+    invalidFormat: {
+      en: 'Invalid file format. Please use CSV or XLSX.',
+      ar: 'صيغة ملف غير صالحة. يرجى استخدام CSV أو XLSX.'
+    },
+    fileTooLarge: {
+      en: 'File is too large. Maximum size is 10MB.',
+      ar: 'الملف كبير جداً. الحد الأقصى هو 10MB.'
+    },
+    emptyFile: {
+      en: 'The file is empty or has no valid data.',
+      ar: 'الملف فارغ أو لا يحتوي على بيانات صالحة.'
+    },
+    parseError: {
+      en: 'Failed to parse the file. Please check the format.',
+      ar: 'فشل في تحليل الملف. يرجى التحقق من التنسيق.'
+    },
+    validRows: {
+      en: 'Valid',
+      ar: 'صالح'
+    },
+    invalidRows: {
+      en: 'Invalid',
+      ar: 'غير صالح'
+    },
+    duplicateRows: {
+      en: 'Duplicates',
+      ar: 'مكرر'
+    },
+    status: {
+      en: 'Status',
+      ar: 'الحالة'
+    },
+    duplicate: {
+      en: 'Duplicate (will skip)',
+      ar: 'مكرر (سيتم تخطيه)'
+    },
+    defaultCategory: {
+      en: 'General',
+      ar: 'عام'
+    },
+    noValidRows: {
+      en: 'No valid rows to import. Please fix the errors and try again.',
+      ar: 'لا توجد صفوف صالحة للاستيراد. يرجى إصلاح الأخطاء والمحاولة مرة أخرى.'
+    },
+    importing: {
+      en: 'Importing...',
+      ar: 'جاري الاستيراد...'
+    },
+    pleaseWait: {
+      en: 'Please wait while we import your data.',
+      ar: 'يرجى الانتظار بينما نستورد بياناتك.'
+    },
+    importSuccess: {
+      en: 'Import Successful!',
+      ar: 'تم الاستيراد بنجاح!'
+    },
+    importFailed: {
+      en: 'Import Failed',
+      ar: 'فشل الاستيراد'
+    },
+    imported: {
+      en: 'Imported',
+      ar: 'تم استيراده'
+    },
+    skipped: {
+      en: 'Skipped',
+      ar: 'تم تخطيه'
+    },
+    failed: {
+      en: 'Failed',
+      ar: 'فشل'
+    },
+    errorsOccurred: {
+      en: 'Some rows failed to import',
+      ar: 'فشل استيراد بعض الصفوف'
+    },
+    downloadErrors: {
+      en: 'Download Error Report',
+      ar: 'تحميل تقرير الأخطاء'
+    },
+    importMore: {
+      en: 'Import More',
+      ar: 'استيراد المزيد'
+    },
+    importNow: {
+      en: 'Import Now',
+      ar: 'استيراد الآن'
     }
   },
 

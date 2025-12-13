@@ -10,7 +10,9 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../i18n/useTranslation';
 import { Tenant } from '../contexts/TenantContext';
 import { KnowledgeItem, CategoryData } from '../types';
-import { Plus, LayoutDashboard, Loader2, Settings, ExternalLink, AlertCircle, Shield, Crown } from 'lucide-react';
+import { Plus, LayoutDashboard, Loader2, Settings, ExternalLink, AlertCircle, Shield, Crown, Upload, Download } from 'lucide-react';
+import { BulkImportModal } from '../components/Admin/BulkImportModal';
+import { exportToCSV, exportToXLSX } from '../utils/bulkImport';
 
 export default function Admin() {
     const { slug } = useParams<{ slug: string }>();
@@ -29,6 +31,8 @@ export default function Admin() {
     const [isLoading, setIsLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingItem, setEditingItem] = useState<KnowledgeItem | undefined>(undefined);
+    const [isBulkImportOpen, setIsBulkImportOpen] = useState(false);
+    const [showExportMenu, setShowExportMenu] = useState(false);
 
     // Check if user can edit (owner or admin)
     const canEdit = userRole === 'owner' || userRole === 'admin';
@@ -207,6 +211,53 @@ export default function Admin() {
                             <ExternalLink className="w-4 h-4" />
                             {language === 'ar' ? 'عرض الموقع' : 'View Site'}
                         </Link>
+
+                        {/* Export Button with Dropdown */}
+                        <div className="relative">
+                            <button
+                                onClick={() => setShowExportMenu(!showExportMenu)}
+                                disabled={data.length === 0}
+                                className={`px-4 py-2 bg-daleel-tech-slate border border-daleel-cyan/30 text-daleel-pure-light rounded-lg hover:border-daleel-cyan transition-colors font-medium flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed ${isRTL ? 'flex-row-reverse' : ''}`}
+                            >
+                                <Download className="w-4 h-4" />
+                                {t('admin.export')}
+                            </button>
+                            {showExportMenu && (
+                                <>
+                                    <div className="fixed inset-0 z-10" onClick={() => setShowExportMenu(false)} />
+                                    <div className={`absolute top-full mt-2 ${isRTL ? 'left-0' : 'right-0'} bg-daleel-tech-slate border border-daleel-cyan/30 rounded-lg shadow-xl z-20 overflow-hidden min-w-[120px]`}>
+                                        <button
+                                            onClick={() => {
+                                                exportToCSV(data);
+                                                setShowExportMenu(false);
+                                            }}
+                                            className="w-full px-4 py-2 text-daleel-pure-light hover:bg-daleel-deep-space transition-colors text-left"
+                                        >
+                                            CSV
+                                        </button>
+                                        <button
+                                            onClick={() => {
+                                                exportToXLSX(data);
+                                                setShowExportMenu(false);
+                                            }}
+                                            className="w-full px-4 py-2 text-daleel-pure-light hover:bg-daleel-deep-space transition-colors text-left"
+                                        >
+                                            XLSX
+                                        </button>
+                                    </div>
+                                </>
+                            )}
+                        </div>
+
+                        {/* Import Button */}
+                        <button
+                            onClick={() => setIsBulkImportOpen(true)}
+                            className={`px-4 py-2 bg-daleel-tech-slate border border-daleel-cyan/30 text-daleel-pure-light rounded-lg hover:border-daleel-cyan transition-colors font-medium flex items-center gap-2 ${isRTL ? 'flex-row-reverse' : ''}`}
+                        >
+                            <Upload className="w-4 h-4" />
+                            {t('admin.import')}
+                        </button>
+
                         <button
                             onClick={handleAdd}
                             className={`px-4 py-2 text-daleel-deep-space rounded-lg hover:opacity-90 transition-all font-bold flex items-center gap-2 shadow-lg glow-neon ${isRTL ? 'flex-row-reverse' : ''}`}
@@ -241,6 +292,13 @@ export default function Admin() {
                 initialData={editingItem}
                 tenantId={tenant?.id || ''}
                 geminiApiKey={tenant?.gemini_api_key || undefined}
+            />
+
+            <BulkImportModal
+                isOpen={isBulkImportOpen}
+                onClose={() => setIsBulkImportOpen(false)}
+                onSuccess={handleSuccess}
+                tenantId={tenant?.id || ''}
             />
 
         </div>

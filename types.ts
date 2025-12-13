@@ -28,3 +28,29 @@ export interface AnalyticsData {
 }
 
 export type SortOption = 'mostClicked' | 'category' | 'alphabetical';
+
+// Bulk Import Types
+export type ImportStep = 'upload' | 'preview' | 'importing' | 'complete';
+
+export interface ParsedRow {
+  rowIndex: number;
+  data: Partial<KnowledgeItem>;
+  isValid: boolean;
+  errors: string[];
+  isDuplicate?: boolean;
+}
+
+export interface ImportProgress {
+  total: number;
+  processed: number;
+  successful: number;
+  skipped: number;
+  failed: number;
+}
+
+export interface ImportResult {
+  success: number;
+  skipped: number;
+  failed: number;
+  errors: { row: number; message: string }[];
+}
