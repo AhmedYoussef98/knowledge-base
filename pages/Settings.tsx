@@ -79,7 +79,8 @@ export default function Settings() {
                     fetchMembers(myTenant.id);
                     fetchInvites(myTenant.id);
                 } else {
-                    navigate('/dashboard');
+                    // User doesn't own a tenant - redirect to onboarding to create one
+                    navigate('/onboarding');
                 }
                 setLoading(false);
             }

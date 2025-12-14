@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Globe, Home, Settings, LogOut, Shield, LayoutDashboard } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguage } from '../contexts/LanguageContext';
 import { useTranslation } from '../i18n/useTranslation';
+import { getMyTenant } from '../services/tenantApi';
 
 interface Props {
   tenantName?: string;
@@ -22,6 +23,20 @@ export const Navbar: React.FC<Props> = ({
   const navigate = useNavigate();
   const { language, toggleLanguage } = useLanguage();
   const { t } = useTranslation();
+  const [isOwner, setIsOwner] = useState(false);
+
+  // Check if user owns a tenant (for settings visibility)
+  useEffect(() => {
+    const checkOwnership = async () => {
+      if (user) {
+        const myTenant = await getMyTenant();
+        setIsOwner(myTenant !== null);
+      } else {
+        setIsOwner(false);
+      }
+    };
+    checkOwnership();
+  }, [user]);
 
   const handleSignOut = async () => {
     await signOut();
@@ -100,8 +115,8 @@ export const Navbar: React.FC<Props> = ({
               </Link>
             )}
 
-            {/* Settings Link - only show if user is logged in */}
-            {user && (
+            {/* Settings Link - only show if user owns a tenant */}
+            {isOwner && (
               <Link
                 to="/settings"
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/10 hover:bg-daleel-cyan/20 transition-all text-sm border border-daleel-cyan/30 hover:border-daleel-cyan/60"
