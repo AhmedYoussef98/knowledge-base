@@ -66,6 +66,7 @@ export const getTenantBySlug = async (slug: string): Promise<Tenant | null> => {
 
 /**
  * Get current user's tenant (where they are owner)
+ * Returns the first tenant if user owns multiple
  */
 export const getMyTenant = async (): Promise<Tenant | null> => {
     const { data: { user } } = await supabase.auth.getUser();
@@ -76,14 +77,15 @@ export const getMyTenant = async (): Promise<Tenant | null> => {
         .from('tenants')
         .select('*')
         .eq('owner_id', user.id)
-        .single();
+        .order('created_at', { ascending: true })
+        .limit(1);
 
     if (error) {
         console.error('Error fetching user tenant:', error);
         return null;
     }
 
-    return data as Tenant;
+    return data && data.length > 0 ? data[0] as Tenant : null;
 };
 
 /**
