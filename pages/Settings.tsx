@@ -65,28 +65,30 @@ export default function Settings() {
 
     useEffect(() => {
         const fetchTenant = async () => {
-            if (user) {
-                const myTenant = await getMyTenant();
-                if (myTenant) {
-                    setTenant(myTenant);
-                    setName(myTenant.name);
-                    setSlug(myTenant.slug);
-                    setOriginalSlug(myTenant.slug);
-                    setApiKey(myTenant.gemini_api_key || '');
-                    setPrimaryColor(myTenant.primary_color || '#A3FF47');
+            // Wait for auth to finish loading before fetching
+            if (authLoading) return;
+            if (!user?.id) return;
 
-                    // Fetch team members and invites
-                    fetchMembers(myTenant.id);
-                    fetchInvites(myTenant.id);
-                } else {
-                    // User doesn't own a tenant - redirect to onboarding to create one
-                    navigate('/onboarding');
-                }
-                setLoading(false);
+            const myTenant = await getMyTenant();
+            if (myTenant) {
+                setTenant(myTenant);
+                setName(myTenant.name);
+                setSlug(myTenant.slug);
+                setOriginalSlug(myTenant.slug);
+                setApiKey(myTenant.gemini_api_key || '');
+                setPrimaryColor(myTenant.primary_color || '#A3FF47');
+
+                // Fetch team members and invites
+                fetchMembers(myTenant.id);
+                fetchInvites(myTenant.id);
+            } else {
+                // User is authenticated but doesn't own a tenant
+                navigate('/onboarding');
             }
+            setLoading(false);
         };
         fetchTenant();
-    }, [user, navigate]);
+    }, [user?.id, authLoading, navigate]);
 
     const fetchMembers = async (tenantId: string) => {
         setLoadingMembers(true);

@@ -28,7 +28,7 @@ export const Navbar: React.FC<Props> = ({
   // Check if user owns a tenant (for settings visibility)
   useEffect(() => {
     const checkOwnership = async () => {
-      if (user) {
+      if (user?.id) {
         const myTenant = await getMyTenant();
         setIsOwner(myTenant !== null);
       } else {
@@ -36,7 +36,7 @@ export const Navbar: React.FC<Props> = ({
       }
     };
     checkOwnership();
-  }, [user]);
+  }, [user?.id]);
 
   const handleSignOut = async () => {
     await signOut();
