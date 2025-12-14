@@ -118,7 +118,14 @@ Instructions:
 - If the question relates to content in the knowledge base, quote or reference the relevant information
 - If you're not sure, say so honestly
 - Keep responses friendly and professional
-${language === 'ar' ? '- Respond in Arabic' : '- Respond in English'}`;
+
+IMPORTANT - Language Instructions:
+- Detect the language of the user's question above
+- ALWAYS respond in the SAME language the user wrote in
+- If the user writes in Arabic, respond entirely in Arabic
+- If the user writes in English, respond entirely in English
+- If the user writes in any other language, respond in that language
+- Do NOT mix languages in your response`;
 
             const result = await model.generateContent(prompt);
             const response = await result.response;

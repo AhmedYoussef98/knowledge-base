@@ -579,6 +579,66 @@ export const translations = {
     }
   },
 
+  // AI Field Helpers
+  aiField: {
+    assistant: {
+      en: 'AI Assistant',
+      ar: 'المساعد الذكي'
+    },
+    autoFillAll: {
+      en: 'Auto-Fill All',
+      ar: 'ملء تلقائي للكل'
+    },
+    autoFillDescription: {
+      en: 'Type a question and let AI generate all fields, or use individual AI buttons on each field.',
+      ar: 'اكتب سؤالاً ودع الذكاء الاصطناعي يملأ جميع الحقول، أو استخدم أزرار AI على كل حقل.'
+    },
+    generate: {
+      en: 'Generate with AI',
+      ar: 'إنشاء بالذكاء الاصطناعي'
+    },
+    generateDisabled: {
+      en: 'Clear field to generate new content',
+      ar: 'امسح الحقل لإنشاء محتوى جديد'
+    },
+    enhance: {
+      en: 'Enhance with AI',
+      ar: 'تحسين بالذكاء الاصطناعي'
+    },
+    enhanceDisabled: {
+      en: 'Add content first to enhance',
+      ar: 'أضف محتوى أولاً للتحسين'
+    },
+    revert: {
+      en: 'Revert to original',
+      ar: 'العودة للأصل'
+    },
+    revertDisabled: {
+      en: 'No AI changes to revert',
+      ar: 'لا توجد تغييرات للتراجع عنها'
+    },
+    generating: {
+      en: 'Generating...',
+      ar: 'جاري الإنشاء...'
+    },
+    enhancing: {
+      en: 'Enhancing...',
+      ar: 'جاري التحسين...'
+    },
+    noApiKey: {
+      en: 'Add your Gemini API key in Settings to enable AI features.',
+      ar: 'أضف مفتاح Gemini API في الإعدادات لتفعيل ميزات الذكاء الاصطناعي.'
+    },
+    questionRequired: {
+      en: 'Please enter a question first',
+      ar: 'يرجى إدخال سؤال أولاً'
+    },
+    error: {
+      en: 'AI generation failed',
+      ar: 'فشل الإنشاء بالذكاء الاصطناعي'
+    }
+  },
+
   // Knowledge Base (Home)
   kb: {
     askAI: {

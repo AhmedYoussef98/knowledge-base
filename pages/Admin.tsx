@@ -292,6 +292,7 @@ export default function Admin() {
                 initialData={editingItem}
                 tenantId={tenant?.id || ''}
                 geminiApiKey={tenant?.gemini_api_key || undefined}
+                tenantName={tenant?.name}
             />
 
             <BulkImportModal
